@@ -9,6 +9,7 @@
 #include "Templates/SharedPointer.h"
 #include "ItemWidget.generated.h"
 
+class UTextBlock;
 class UItemBase;
 class UInventoryComponent;
 class UImage;
@@ -42,12 +43,6 @@ public:
 	
 protected:
 	TObjectPtr<UItemBase const> ItemInstance;
-	
-	UPROPERTY(BlueprintReadWrite)
-	int ItemCount { 0 };
-
-	UPROPERTY(BlueprintReadWrite)
-	FText DisplayName;
 
 	bool bIsOccupied { false };
 	
@@ -62,6 +57,12 @@ protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UImage> Image;
 
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<UTextBlock> DisplayName;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<UTextBlock> DisplayCount;
+	
 	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr<UInventoryComponent> InventoryComponent;
 	

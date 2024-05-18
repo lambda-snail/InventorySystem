@@ -3,6 +3,8 @@
 
 #include "Inventory/Ui/ItemWidget.h"
 
+#include "Components/Image.h"
+#include "Components/TextBlock.h"
 #include "Engine/StaticMeshActor.h"
 #include "Inventory/InventoryComponent.h"
 #include "Inventory/ItemBase.h"
@@ -20,11 +22,12 @@ void UItemWidget::NativeOnListItemObjectSet(UObject* ListItemObject)
 void UItemWidget::SetItem(UItemBase const* Item, int Count)
 {
 	this->ItemInstance = Item;
-	ItemCount = Count;
+
+	DisplayCount->SetText(FText::AsNumber(Count));
 	if(Item and Item->GetItemData())
 	{
-		Icon = Item->GetItemData()->Icon;
-		DisplayName = Item->GetItemData()->DisplayName;
+		Image->SetBrush(Item->GetItemData()->Icon);
+		DisplayName->SetText(Item->GetItemData()->DisplayName);
 	}
 
 	bIsOccupied = true;
@@ -36,8 +39,8 @@ void UItemWidget::UnsetItem()
 	Icon = DefaultIcon;
 	ItemInstance = nullptr;
 	bIsOccupied = false;
-	DisplayName = FText::GetEmpty();
-	ItemCount = 0;
+	//DisplayName-> = FText::GetEmpty();
+	//ItemCount = 0;
 	OnUnsetItem();
 }
 
