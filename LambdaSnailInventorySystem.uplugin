@@ -1,0 +1,30 @@
+﻿{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.3",
+	"FriendlyName": "LambdaSnailInventorySystem",
+	"Description": "A simple inventory system",
+	"Category": "Other",
+	"CreatedBy": "Niclas Blomberg",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": true,
+	"IsExperimentalVersion": true,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "LambdaSnailInventorySystem",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "GameplayAbilities",
+			"Type": "Runtime",
+			"Enabled": true
+		}
+	]
+}
