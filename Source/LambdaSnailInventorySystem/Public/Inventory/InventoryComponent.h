@@ -73,6 +73,11 @@ struct FItemTransferRequest
 	TObjectPtr<UInventoryComponent> TargetInventoryComponent { nullptr };
 };
 
+/**
+ * We don't expose the array of items directly to callers, but instead map the FItemSlotInstances to
+ * objects of type UInventoryEntry. This is a UObject for compatibility reasons with UMG and other APIs
+ * that expect UObject pointers as parameters.
+ */
 UCLASS()
 class UInventoryEntry : public UObject
 {
@@ -84,6 +89,10 @@ public:
 	int Count { 0 };
 };
 
+/**
+ * Internally items in the inventory are stored in an FItemSlotInstance that keeps track the item and metadata related
+ * to storing that item.
+ */
 USTRUCT()
 struct FItemSlotInstance
 {
