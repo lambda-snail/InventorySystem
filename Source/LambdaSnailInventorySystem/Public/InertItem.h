@@ -23,9 +23,9 @@ public:
 	virtual void CreateComponentForPickup(AActor* Actor) const override;
 	
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TSubclassOf<UStaticMeshComponent> PhysicalRepresentationComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UStaticMesh> Mesh;
 };

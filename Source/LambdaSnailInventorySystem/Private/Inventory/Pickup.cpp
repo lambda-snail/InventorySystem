@@ -17,9 +17,6 @@ APickup::APickup()
 	Trigger->SetupAttachment(Root);
 	Trigger->SetCanEverAffectNavigation(false); 
 
-	Trigger->OnComponentBeginOverlap.AddDynamic(this, &APickup::OnSphereBeginOverlap);
-	Trigger->OnComponentEndOverlap.AddDynamic(this, &APickup::OnSphereEndOverlap);
-	
 	// PhysicalItem = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PhysicalItem"));
 	// PhysicalItem->SetupAttachment(Root);
 	// PhysicalItem->SetRelativeLocation(FVector::ZeroVector);
@@ -37,6 +34,9 @@ void APickup::OnPickUp(AActor* Agent)
 // Called when the game starts or when spawned
 void APickup::BeginPlay()
 {
+	Trigger->OnComponentBeginOverlap.AddDynamic(this, &APickup::OnSphereBeginOverlap);
+	Trigger->OnComponentEndOverlap.AddDynamic(this, &APickup::OnSphereEndOverlap);
+	
 	if(not Item)
 	{
 		UClass const* ItemBaseClass = ItemClass.Get();

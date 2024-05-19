@@ -37,7 +37,7 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> Root;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USphereComponent> Trigger;
 
 	// if true, the player will not pick up the item immediately on overlap, but will instead be given an interaction
