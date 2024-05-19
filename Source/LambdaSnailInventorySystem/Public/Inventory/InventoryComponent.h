@@ -142,6 +142,7 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnInventoryInitializedDelegate OnInventoryInitialized;
 
+	UFUNCTION(BlueprintCallable)
 	bool IsInitialized() const;
 
 	UFUNCTION(BlueprintCallable)

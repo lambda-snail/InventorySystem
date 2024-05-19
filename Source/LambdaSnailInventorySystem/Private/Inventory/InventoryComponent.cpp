@@ -203,6 +203,11 @@ TArray<UInventoryEntry*> UInventoryComponent::GetItems() const
 
 	for (int i = 0; i < Items.Num(); ++i)
 	{
+		if(not Items[i].Item)
+		{
+			continue;
+		}
+		
 		// TODO: Make slot uobject with an interface so we don't have to allocate?
 		auto Entry = NewObject<UInventoryEntry>();
 		Entry->Item = Items[i].Item;
