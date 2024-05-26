@@ -9,6 +9,7 @@
 APickup::APickup()
 {
 	PrimaryActorTick.bCanEverTick = false;
+	bReplicates = true;
 	
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
@@ -17,10 +18,8 @@ APickup::APickup()
 	Trigger->SetupAttachment(Root);
 	Trigger->SetCanEverAffectNavigation(false); 
 
-	// PhysicalItem = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PhysicalItem"));
-	// PhysicalItem->SetupAttachment(Root);
-	// PhysicalItem->SetRelativeLocation(FVector::ZeroVector);
-	// PhysicalItem->SetCanEverAffectNavigation(false);
+	Trigger->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	Trigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void APickup::OnPickUp(AActor* Agent)
@@ -36,6 +35,12 @@ void APickup::BeginPlay()
 {
 	Trigger->OnComponentBeginOverlap.AddDynamic(this, &APickup::OnSphereBeginOverlap);
 	Trigger->OnComponentEndOverlap.AddDynamic(this, &APickup::OnSphereEndOverlap);
+
+	if(HasAuthority())
+	{
+		Trigger->SetCollisionResponseToChannel(DefaultCollisionChannel, DefaultCollisionResponse);
+		Trigger->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
 	
 	if(not Item)
 	{
@@ -47,7 +52,7 @@ void APickup::BeginPlay()
 	//PhysicalRepresentation = Item->GetOrCreatePhysicalRepresentation(GetTransform());
 	
 	Item->CreateComponentForPickup(this);
-	
+
 	Super::BeginPlay();
 }
 

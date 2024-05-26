@@ -37,21 +37,29 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> Root;
 	
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Trigger")
 	TObjectPtr<USphereComponent> Trigger;
 
-	// if true, the player will not pick up the item immediately on overlap, but will instead be given an interaction
+	// If true, the player will not pick up the item immediately on overlap, but will instead be given an interaction
 	// prompt asking if the item should be picked up.
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Trigger")
 	bool bInteractiveTrigger { true };
 
+	// The collision channel to register to when the pickup has authority
+	UPROPERTY(EditAnywhere, Category = "Trigger")
+	TEnumAsByte<ECollisionChannel> DefaultCollisionChannel { ECollisionChannel::ECC_Pawn };
+
+	// The collision response to the default channel (only when the pickup has authority)
+	UPROPERTY(EditAnywhere, Category = "Trigger")
+	TEnumAsByte<ECollisionResponse> DefaultCollisionResponse { ECollisionResponse::ECR_Overlap };
+	
 	// The class of item to spawn, if no item is assigned.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
 	TSubclassOf<UItemBase> ItemClass;
 
 	// The item that will be picked up by this pickup. If Item is not null, then one
 	// will be created using the ItemClass template.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
 	TObjectPtr<UItemBase> Item;
 
 	UFUNCTION()
