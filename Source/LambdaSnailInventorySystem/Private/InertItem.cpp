@@ -33,13 +33,7 @@ void UInertItem::OnDrop_Implementation(AActor* Owner)
 	}
 }
 
-void UInertItem::CreateComponentForPickup(AActor* Actor) const
+UStaticMesh* UInertItem::GetMesh() const
 {
-	UActorComponent* ActorComponent = Actor->AddComponentByClass(PhysicalRepresentationComponent, false, {}, true);
-
-	UStaticMeshComponent* MeshComponent = Cast<UStaticMeshComponent>(ActorComponent);
-	MeshComponent->SetupAttachment(Actor->GetRootComponent());
-	MeshComponent->SetStaticMesh(Mesh);
-
-	MeshComponent->RegisterComponent();
+	return Mesh;
 }

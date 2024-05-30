@@ -20,12 +20,12 @@ public:
 	virtual void OnPickup_Implementation(AActor* Owner) override;
 	virtual void OnDrop_Implementation(AActor* Owner) override;
 
-	virtual void CreateComponentForPickup(AActor* Actor) const override;
+	virtual UStaticMesh* GetMesh() const;
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<UStaticMeshComponent> PhysicalRepresentationComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UStaticMesh> Mesh;
+	UStaticMesh* Mesh;
 };

@@ -1,5 +1,6 @@
 #include "Inventory/Pickup.h"
 
+#include "InertItem.h"
 #include "Components/SphereComponent.h"
 #include "Inventory/InventoryComponent.h"
 #include "Inventory/ItemBase.h"
@@ -11,15 +12,18 @@ APickup::APickup()
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
 	
-	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	Root = CreateDefaultSubobject<USceneComponent>("Root");
 	SetRootComponent(Root);
 	
-	Trigger = CreateDefaultSubobject<USphereComponent>(TEXT("Trigger"));
+	Trigger = CreateDefaultSubobject<USphereComponent>("Trigger");
 	Trigger->SetupAttachment(Root);
 	Trigger->SetCanEverAffectNavigation(false); 
 
 	Trigger->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	Trigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
+	StaticMeshComponent->SetupAttachment(Root);
 }
 
 void APickup::OnPickUp(AActor* Agent)
@@ -45,13 +49,11 @@ void APickup::BeginPlay()
 	if(not Item)
 	{
 		UClass const* ItemBaseClass = ItemClass.Get();
-		UObject* CreatedItem = NewObject<UItemBase>(this, ItemBaseClass);
-		Item = Cast<UItemBase>(CreatedItem);
+		UObject* CreatedItem = NewObject<UInertItem>(this, ItemBaseClass);
+		Item = Cast<UInertItem>(CreatedItem);
 	}
 
-	//PhysicalRepresentation = Item->GetOrCreatePhysicalRepresentation(GetTransform());
-	
-	Item->CreateComponentForPickup(this);
+	StaticMeshComponent->SetStaticMesh(Item->GetMesh());
 
 	Super::BeginPlay();
 }

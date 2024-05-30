@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Inventory/ItemBase.h"
 #include "Pickup.generated.h"
 
+class UInertItem;
 class IInventoryActor;
 class UWidgetComponent;
 class AfpsCharacter;
@@ -37,9 +37,12 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> Root;
 	
-	UPROPERTY(VisibleAnywhere, Category = "Trigger")
+	UPROPERTY(VisibleAnywhere, Category = "Pickup")
 	TObjectPtr<USphereComponent> Trigger;
 
+	UPROPERTY(VisibleAnywhere, Category = "Pickup")
+	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
+	
 	// If true, the player will not pick up the item immediately on overlap, but will instead be given an interaction
 	// prompt asking if the item should be picked up.
 	UPROPERTY(EditAnywhere, Category = "Trigger")
@@ -55,12 +58,12 @@ protected:
 	
 	// The class of item to spawn, if no item is assigned.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
-	TSubclassOf<UItemBase> ItemClass;
+	TSubclassOf<UInertItem> ItemClass;
 
 	// The item that will be picked up by this pickup. If Item is not null, then one
 	// will be created using the ItemClass template.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
-	TObjectPtr<UItemBase> Item;
+	TObjectPtr<UInertItem> Item;
 
 	UFUNCTION()
 	void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
