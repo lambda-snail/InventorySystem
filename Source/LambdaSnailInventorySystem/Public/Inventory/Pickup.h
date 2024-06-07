@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InteractiveElement.h"
 #include "Pickup.generated.h"
 
 class UInertItem;
 class IInventoryActor;
 class UWidgetComponent;
-class AfpsCharacter;
 class UItemType;
 struct FItemInstance;
 class USphereComponent;
@@ -18,7 +18,7 @@ class USphereComponent;
  * picked up by a character.
  */
 UCLASS()
-class LAMBDASNAILINVENTORYSYSTEM_API APickup : public AActor
+class LAMBDASNAILINVENTORYSYSTEM_API APickup : public AActor, public IInteractiveElement
 {
 	GENERATED_BODY()
 	
@@ -34,6 +34,9 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	virtual void OnPickup(TScriptInterface<IInventoryActor> PickupCharacter);
 
+	FORCEINLINE virtual bool CanInteract() const;
+	virtual void Interact(AActor* Interactor);
+	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> Root;
 	
@@ -64,7 +67,7 @@ protected:
 	// will be created using the ItemClass template.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
 	TObjectPtr<UInertItem> Item;
-
+	
 	UFUNCTION()
 	void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()

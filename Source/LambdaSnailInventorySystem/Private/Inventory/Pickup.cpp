@@ -1,11 +1,13 @@
 #include "Inventory/Pickup.h"
 
+#include "Inventory/InventoryLog.h"
 #include "InertItem.h"
 #include "Components/SphereComponent.h"
 #include "Inventory/InventoryComponent.h"
 #include "Inventory/ItemBase.h"
 #include "Inventory/InventoryActor.h"
 #include "Inventory/ItemUser.h"
+#include "Logging/StructuredLog.h"
 
 APickup::APickup()
 {
@@ -19,9 +21,12 @@ APickup::APickup()
 	Trigger->SetupAttachment(Root);
 	Trigger->SetCanEverAffectNavigation(false); 
 
-	Trigger->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	Trigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//Trigger->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	//Trigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	Trigger->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
+	Trigger->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+	
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
 	StaticMeshComponent->SetupAttachment(Root);
 }
@@ -40,11 +45,11 @@ void APickup::BeginPlay()
 	Trigger->OnComponentBeginOverlap.AddDynamic(this, &APickup::OnSphereBeginOverlap);
 	Trigger->OnComponentEndOverlap.AddDynamic(this, &APickup::OnSphereEndOverlap);
 
-	if(HasAuthority())
-	{
-		Trigger->SetCollisionResponseToChannel(DefaultCollisionChannel, DefaultCollisionResponse);
-		Trigger->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	}
+	// if(HasAuthority())
+	// {
+	// 	Trigger->SetCollisionResponseToChannel(DefaultCollisionChannel, DefaultCollisionResponse);
+	// 	Trigger->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	// }
 	
 	if(not Item)
 	{
@@ -73,6 +78,23 @@ void APickup::OnPickup(TScriptInterface<IInventoryActor> PickupCharacter)
 	else
 	{
 		// TODO: Some kind of feedback when adding fails?
+	}
+}
+
+bool APickup::CanInteract() const
+{
+	return true;
+}
+
+void APickup::Interact(AActor* Interactor)
+{
+	if(Interactor->Implements<UItemUser>())
+	{
+		OnPickup(Interactor);
+	}
+	else
+	{
+		UE_LOGFMT(LambdaSnailInventory, Warning, "Pickup ({}) received an interaction from {}, but this actoer is not an IItemUser", GetName(), Interactor->GetName());
 	}
 }
 
