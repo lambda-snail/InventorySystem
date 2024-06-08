@@ -7,7 +7,6 @@
 #include "Pickup.generated.h"
 
 class UInertItem;
-class IInventoryActor;
 class UWidgetComponent;
 class UItemType;
 struct FItemInstance;
@@ -67,9 +66,4 @@ protected:
 	// will be created using the ItemClass template.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
 	TObjectPtr<UInertItem> Item;
-	
-	UFUNCTION()
-	void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	UFUNCTION()
-	void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };
