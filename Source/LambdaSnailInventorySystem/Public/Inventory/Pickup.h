@@ -34,8 +34,8 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	virtual void OnPickup(TScriptInterface<IInventoryActor> PickupCharacter);
 
-	FORCEINLINE virtual bool CanInteract() const;
-	virtual void Interact(AActor* Interactor);
+	FORCEINLINE virtual bool CanInteract() const override;
+	virtual void Interact(AActor* Interactor) override;
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> Root;
