@@ -59,7 +59,7 @@ void UInventoryWidget::NativeConstruct()
 void UInventoryWidget::ReloadInventory()
 {
 	Items = OwningComponent->GetItems();
-	InventoryView->SetListItems<UInventoryEntry*>(Items);
+	InventoryView->SetListItems<UItemSlotInstance*>(Items);
 	
 	// for(auto* Item : Items)
 	// {

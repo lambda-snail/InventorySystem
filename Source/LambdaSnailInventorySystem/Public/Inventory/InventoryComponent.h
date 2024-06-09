@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Inventory.h"
+#include "ItemBase.h"
 #include "Components/ActorComponent.h"
+#include "Network/ReplicatedObject.h"
 #include "InventoryComponent.generated.h"
 
 class UItemBase;
@@ -74,43 +76,40 @@ struct FItemTransferRequest
 };
 
 /**
- * We don't expose the array of items directly to callers, but instead map the FItemSlotInstances to
- * objects of type UInventoryEntry. This is a UObject for compatibility reasons with UMG and other APIs
- * that expect UObject pointers as parameters.
+ * Internally items in the inventory are stored in an FItemSlotInstance that keeps track the item and metadata related
+ * to storing that item.
  */
 UCLASS()
-class UInventoryEntry : public UObject
+class UItemSlotInstance : public UReplicatedObject
 {
 	GENERATED_BODY()
 
 public:
-	TObjectPtr<UItemBase> Item;
+	UPROPERTY(Replicated)
 	uint32 Index { 0 };
-	int Count { 0 };
-};
 
-/**
- * Internally items in the inventory are stored in an FItemSlotInstance that keeps track the item and metadata related
- * to storing that item.
- */
-USTRUCT()
-struct FItemSlotInstance
-{
-	GENERATED_BODY()
-	
-	TObjectPtr<UItemBase> Item;
-	uint32 Index { 0 };
-	
+	UPROPERTY(Replicated)
 	int Count { 0 };
 
 	// Determines which items are compatible with this slot. If the tag is empty, all items are allowed.
+	UPROPERTY(Replicated)
 	FGameplayTag SlotTag;
 
-	void SetData(TObjectPtr<UItemBase> NewItem, int ItemCount = 1)
+	UPROPERTY(Replicated)
+	UInventoryComponent* OwningInventoryComponent;
+
+	FORCEINLINE void SetData(UItemBase* NewItem, int ItemCount = 1)
 	{
 		Item = NewItem;
 		Count = ItemCount;
+
+		if(NewItem)
+		{
+			NewItem->ChangeOwner(GetOwner());			
+		}
 	}
+
+	FORCEINLINE UItemBase* GetItem() const { return Item; };
 	
 	void ResetData()
 	{
@@ -122,6 +121,15 @@ struct FItemSlotInstance
 	{
 		return not Item || Count == 0;
 	}
+
+protected:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UPROPERTY(ReplicatedUsing=OnRep_Item)
+	TObjectPtr<UItemBase> Item;
+	
+	UFUNCTION()
+	void OnRep_Item();
 };
 
 UCLASS(ClassGroup=Inventory, hidecategories=(Object,LOD,Lighting,Transform,Sockets,TextureStreaming), editinlinenew, meta=(BlueprintSpawnableComponent))
@@ -149,7 +157,7 @@ public:
 	virtual EItemAddResult TryAddItem(UItemBase* Item);
 	virtual EItemAddResult TryAddItem(UItemBase* Item, uint32 Slot);
 
-	// TODO: When moving a stack to equipment it gets destroyed, so change this to virtual and override 
+	// RPC Server
 	virtual EItemTransferResult TryMoveItem(FItemTransferRequest const& TransferRequest);
 
 	// Searches the inventory for an item instance matching a specific tag. Warning: May iterate over all slots in the container.
@@ -164,20 +172,31 @@ public:
 	 */
 	bool TryRemoveItem(uint32 Slot);
 
-	TArray<UInventoryEntry*> GetItems() const;
+	TArray<TObjectPtr<UItemSlotInstance>> GetItems() const;
 	void ForEachItemInstance(TFunction<void(UItemBase const&, uint32 const Count, uint32 const Slot)> const& Callback) const;
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	//virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 	
-	UPROPERTY(EditAnywhere)
-	TArray<FItemSlotInstance> Items;
+	UPROPERTY(EditAnywhere, ReplicatedUsing=OnRep_Items)
+	TArray<TObjectPtr<UItemSlotInstance>> Items;
 
 	// Inventory capacity is the number of items the inventory can hold
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, ReplicatedUsing=OnRep_InventoryCapacity)
 	uint32 InventoryCapacity { 10 };
-
+	
 	uint32 ItemCount { 0 };
 
 	bool bIsInitialized { false };
+
+private:
+	UFUNCTION()
+	void OnRep_Items();
+	UFUNCTION()
+	void OnRep_InventoryCapacity();
+
+	friend class UItemSlotInstance;
 };

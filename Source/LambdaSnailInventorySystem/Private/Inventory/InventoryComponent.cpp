@@ -1,29 +1,57 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Inventory/InventoryComponent.h"
+
+#include "Engine/ActorChannel.h"
 #include "Inventory/ItemBase.h"
+#include "Net/UnrealNetwork.h"
+
 
 UInventoryComponent::UInventoryComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
+	bReplicateUsingRegisteredSubObjectList = true;
+	//SetIsReplicated(true);
 }
 
 void UInventoryComponent::BeginPlay()
 {
-	Items.Reserve(InventoryCapacity);
-	for (uint32 i = 0; i < InventoryCapacity; ++i)
+	if(GetOwner()->HasAuthority())
 	{
-		FItemSlotInstance Slot{};
-		Slot.Item = nullptr;
-		Slot.Index = i;
+		Items.Reserve(InventoryCapacity);
+		for (uint32 i = 0; i < InventoryCapacity; ++i)
+		{
+			UItemSlotInstance* Slot = NewObject<UItemSlotInstance>(GetOwner(), UItemSlotInstance::StaticClass());
+			Slot->SetData(nullptr, 0);
+			Slot->Index = i;
 		
-		Items.Add(Slot);
+			Items.Add(Slot);
+			AddReplicatedSubObject(Slot);
+		}	
 	}
 	
 	Super::BeginPlay();
 	bIsInitialized = true;
 
 	OnInventoryInitialized.Broadcast();
+}
+
+void UInventoryComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	for(UItemSlotInstance* Slot : Items)
+	{
+		RemoveReplicatedSubObject(Slot);
+	}
+	
+	Super::EndPlay(EndPlayReason);
+}
+
+void UInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, Items);
+	DOREPLIFETIME(ThisClass, InventoryCapacity);
 }
 
 uint32 UInventoryComponent::GetCapacity() const
@@ -49,7 +77,7 @@ EItemAddResult UInventoryComponent::TryAddItem(UItemBase* Item)
 	{
 		for (uint32 i = 0; i < InventoryCapacity; ++i)
 		{
-			if (Items[i].IsEmpty())
+			if (Items[i]->IsEmpty())
 			{
 				return TryAddItem(Item, i);
 			}
@@ -63,16 +91,18 @@ EItemAddResult UInventoryComponent::TryAddItem(UItemBase* Item, uint32 Slot)
 {
 	verify(Slot < static_cast<uint32>(Items.Num()));
 
-	if (Items[Slot].SlotTag.IsValid() && not Item->GetItemData()->ItemTags.HasTag(Items[Slot].SlotTag))
+	if (Items[Slot]->SlotTag.IsValid() && not Item->GetItemData()->ItemTags.HasTag(Items[Slot]->SlotTag))
 	{
 		return EItemAddResult::ItemTypeMismatch;
 	}
 
-	if (Items[Slot].IsEmpty())
+	if (Items[Slot]->IsEmpty())
 	{
-		Items[Slot].SetData(Item, 1);
+		Items[Slot]->SetData(Item, 1);
 		++ItemCount;
 
+		AddReplicatedSubObject(Item);
+		
 		OnInventoryChanged.Broadcast();
 		return EItemAddResult::Success;
 	}
@@ -94,10 +124,10 @@ EItemTransferResult UInventoryComponent::TryMoveItem(FItemTransferRequest const&
 	auto& SourceSlot = SourceInventory->Items[TransferRequest.SourceIndex];
 	auto& TargetSlot = TargetInventory->Items[TransferRequest.TargetIndex];
 	
-	auto& SourceItem = *SourceSlot.Item;
+	auto& SourceItem = *SourceSlot->GetItem();
 
 	// Check that we are not accidentally transferring from an empty slot
-	if (SourceSlot.IsEmpty())
+	if (SourceSlot->IsEmpty())
 	{
 		return EItemTransferResult::SourceIndexEmpty;
 	}
@@ -109,25 +139,24 @@ EItemTransferResult UInventoryComponent::TryMoveItem(FItemTransferRequest const&
 	}
 
 	// Does the target slot have the correct type to accomodate the source item?
-	if (TargetSlot.SlotTag.IsValid() && not SourceItem.GetItemData()->ItemTags.HasTag(TargetSlot.SlotTag))
+	if (TargetSlot->SlotTag.IsValid() && not SourceItem.GetItemData()->ItemTags.HasTag(TargetSlot->SlotTag))
 	{
 		return EItemTransferResult::ItemTypeMismatch;
 	}
 
 	// Target slot empty and all checks ok - move the item
-	if (TargetSlot.IsEmpty())
+	if (TargetSlot->IsEmpty())
 	{
-		TargetSlot.SetData(&SourceItem, 1);
-
-		SourceSlot.ResetData();
-
+		TargetSlot->SetData(&SourceItem, 1);
+		SourceSlot->ResetData();
+		
 		SourceInventory->OnInventoryChanged.Broadcast();
 		TargetInventory->OnInventoryChanged.Broadcast();
 		return EItemTransferResult::Success;
 	}
 
 	// Target slot occupied
-	auto& TargetItem = *TargetSlot.Item;
+	auto& TargetItem = *TargetSlot->GetItem();
 	
 	// -  Different items
 	if (not SourceItem.IsSameItem(TargetItem))
@@ -138,9 +167,9 @@ EItemTransferResult UInventoryComponent::TryMoveItem(FItemTransferRequest const&
 	// -  Same type and stackable
 	if (SourceItem.GetItemData()->bIsStackable)
 	{
-		TargetSlot.Count += SourceSlot.Count;
+		TargetSlot->Count += SourceSlot->Count;
 
-		SourceSlot.ResetData();
+		SourceSlot->ResetData();
 
 		SourceInventory->OnInventoryChanged.Broadcast();
 		TargetInventory->OnInventoryChanged.Broadcast();
@@ -155,9 +184,9 @@ TObjectPtr<UItemBase> UInventoryComponent::GetItemByTag(FGameplayTag const ItemT
 {
 	for (int i = 0; i < Items.Num(); ++i)
 	{
-		if (Items[i].Item->GetItemData()->ItemTags.HasTag(ItemTag))
+		if (Items[i]->GetItem()->GetItemData()->ItemTags.HasTag(ItemTag))
 		{
-			return Items[i].Item;
+			return Items[i]->GetItem();
 		}
 	}
 
@@ -166,7 +195,7 @@ TObjectPtr<UItemBase> UInventoryComponent::GetItemByTag(FGameplayTag const ItemT
 
 TObjectPtr<UItemBase> UInventoryComponent::GetItemInSlot(uint32 Slot) const
 {
-	return Items[Slot].Item;
+	return Items[Slot]->GetItem();
 }
 
 int32 UInventoryComponent::GetInventoryCapacity() const
@@ -176,16 +205,16 @@ int32 UInventoryComponent::GetInventoryCapacity() const
 
 int32 UInventoryComponent::GetNumItemsInSlot(uint32 Slot) const
 {
-	return Items[Slot].Count;
+	return Items[Slot]->Count;
 }
 
 bool UInventoryComponent::TryRemoveItem(uint32 Slot)
 {
-	if (Slot < InventoryCapacity && Items[Slot].Count > 0)
+	if (Slot < InventoryCapacity && Items[Slot]->Count > 0)
 	{
-		UItemBase* Item = Items[Slot].Item;
+		UItemBase* Item = Items[Slot]->GetItem();
 		
-		Items[Slot].ResetData();
+		Items[Slot]->ResetData();
 		OnInventoryChanged.Broadcast();
 		
 		Item->OnDrop(GetOwner());
@@ -196,28 +225,35 @@ bool UInventoryComponent::TryRemoveItem(uint32 Slot)
 	return false;
 }
 
-TArray<UInventoryEntry*> UInventoryComponent::GetItems() const
+TArray<TObjectPtr<UItemSlotInstance>> UInventoryComponent::GetItems() const
 {
-	TArray<UInventoryEntry*> Entries{};
-	Entries.Reserve(Items.Num());
+	// TArray<UItemSlotInstance*> Entries{};
+	// Entries.Reserve(Items.Num());
+	//
+	// for (int i = 0; i < Items.Num(); ++i)
+	// {
+	// 	if(Items[i] and Items[i]->Item)
+	// 	{
+	// 		// TODO: Make slot uobject with an interface so we don't have to allocate?
+	// 		auto Entry = NewObject<UItemSlotInstance>();
+	// 		Entry->Item = Items[i]->Item;
+	// 		Entry->Index = Items[i]->Index;
+	// 		Entry->Count = Items[i]->Count;
+	// 	
+	// 		Entries.Add(Entry);			
+	// 	}
+	// }
 
-	for (int i = 0; i < Items.Num(); ++i)
+	TArray<TObjectPtr<UItemSlotInstance>> NonEmptyItems;
+	for (UItemSlotInstance* Slot : Items)
 	{
-		if(not Items[i].Item)
+		if(Slot and Slot->GetItem())
 		{
-			continue;
+			NonEmptyItems.Add(Slot);
 		}
-		
-		// TODO: Make slot uobject with an interface so we don't have to allocate?
-		auto Entry = NewObject<UInventoryEntry>();
-		Entry->Item = Items[i].Item;
-		Entry->Index = Items[i].Index;
-		Entry->Count = Items[i].Count;
-		
-		Entries.Add(Entry);
 	}
 	
-	return 	Entries;
+	return 	NonEmptyItems;
 }
 
 void UInventoryComponent::ForEachItemInstance(
@@ -225,10 +261,57 @@ void UInventoryComponent::ForEachItemInstance(
 {
 	for(uint32 i = 0; i < InventoryCapacity; ++i)
 	{
-		FItemSlotInstance const& ItemSlot{ Items[i] };
-		if (not ItemSlot.IsEmpty())
+		UItemSlotInstance const* ItemSlot{ Items[i] };
+		if (not ItemSlot->IsEmpty())
 		{
-			Callback(*ItemSlot.Item, ItemSlot.Count, ItemSlot.Index);
+			Callback(*ItemSlot->GetItem(), ItemSlot->Count, ItemSlot->Index);
 		}
 	}
+}
+
+void UInventoryComponent::OnRep_Items()
+{
+	ItemCount = 0;
+	for(auto const& Slot : Items)
+	{
+		if(Slot)
+		{
+			ItemCount += Slot->IsEmpty() ? 0 : 1;	
+		}
+	}
+
+	if(OnInventoryChanged.IsBound())
+	{
+		OnInventoryChanged.Broadcast();
+	}
+}
+
+void UInventoryComponent::OnRep_InventoryCapacity()
+{
+	if(OnInventoryChanged.IsBound())
+	{
+		OnInventoryChanged.Broadcast();
+	}
+}
+
+
+
+
+
+
+void UItemSlotInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, Item);
+	DOREPLIFETIME(ThisClass, Count);
+
+	DOREPLIFETIME_CONDITION(ThisClass, Index, COND_InitialOnly);
+	DOREPLIFETIME_CONDITION(ThisClass, SlotTag, COND_InitialOnly);
+	DOREPLIFETIME_CONDITION(ThisClass, OwningInventoryComponent, COND_InitialOnly);
+}
+
+void UItemSlotInstance::OnRep_Item()
+{
+	GEngine->AddOnScreenDebugMessage(23, 2.f, FColor::Red, "Item Replicated!");
 }

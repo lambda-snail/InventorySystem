@@ -12,9 +12,9 @@
 
 void UItemWidget::NativeOnListItemObjectSet(UObject* ListItemObject)
 {
-	if(UInventoryEntry* Entry = Cast<UInventoryEntry>(ListItemObject))
+	if(UItemSlotInstance* Entry = Cast<UItemSlotInstance>(ListItemObject))
 	{
-		SetItem(Entry->Item, Entry->Count);
+		SetItem(Entry->GetItem(), Entry->Count);
 	}
 }
 

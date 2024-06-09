@@ -15,8 +15,9 @@ bool UItemBase::IsSameItem(UItemBase const& Other) const
 	return ItemMetadata->GetPrimaryAssetId() == Other.ItemMetadata->GetPrimaryAssetId();
 }
 
-void UItemBase::CreateComponentForPickup(AActor* Actor) const
+void UItemBase::ChangeOwner(AActor* NewOwner)
 {
+	Rename(nullptr, NewOwner);
 }
 
 UItemType* UItemBase::GetItemData_Implementation() const
@@ -30,4 +31,17 @@ void UItemBase::OnPickup_Implementation(AActor* Owner)
 
 void UItemBase::OnDrop_Implementation(AActor* Owner)
 {
+}
+
+
+
+void UItemBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	UObject::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// Add BP properties
+	if (const UBlueprintGeneratedClass* BPClass = Cast<UBlueprintGeneratedClass>(GetClass()))
+	{
+		BPClass->GetLifetimeBlueprintReplicationList(OutLifetimeProps);
+	}
 }

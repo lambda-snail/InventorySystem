@@ -4,6 +4,7 @@
 #include "InertItem.h"
 
 #include "Engine/StaticMeshActor.h"
+#include "Net/UnrealNetwork.h"
 
 void UInertItem::OnPickup_Implementation(AActor* Owner)
 {
@@ -36,4 +37,11 @@ void UInertItem::OnDrop_Implementation(AActor* Owner)
 UStaticMesh* UInertItem::GetMesh() const
 {
 	return Mesh;
+}
+
+void UInertItem::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, Mesh);
 }

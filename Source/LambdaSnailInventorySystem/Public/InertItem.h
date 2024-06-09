@@ -21,11 +21,10 @@ public:
 	virtual void OnDrop_Implementation(AActor* Owner) override;
 
 	virtual UStaticMesh* GetMesh() const;
-	
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSubclassOf<UStaticMeshComponent> PhysicalRepresentationComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+protected:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated)
 	UStaticMesh* Mesh;
 };

@@ -11,7 +11,7 @@ void UEquipmentComponent::BeginPlay()
 	
 	for (int32 i = 0; i < EquipmentSlotTypes.Num(); ++i)
 	{
-		Items[i].SlotTag = EquipmentSlotTypes[i];
+		Items[i]->SlotTag = EquipmentSlotTypes[i];
 	}
 	
 }
@@ -21,10 +21,10 @@ void UEquipmentComponent::ForEachEquipmentInstance(
 {
 	for(uint32 i = InventoryCapacity; i < InventoryCapacity; ++i)
 	{
-		FItemSlotInstance const& ItemSlot{ Items[i] };
-		if (not ItemSlot.IsEmpty())
+		UItemSlotInstance const* ItemSlot{ Items[i] };
+		if (not ItemSlot->IsEmpty())
 		{
-			Callback(*ItemSlot.Item, ItemSlot.SlotTag, ItemSlot.Index);
+			Callback(*ItemSlot->GetItem(), ItemSlot->SlotTag, ItemSlot->Index);
 		}
 	}
 }

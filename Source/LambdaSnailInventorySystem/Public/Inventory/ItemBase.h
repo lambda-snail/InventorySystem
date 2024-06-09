@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Network/ReplicatedObject.h"
 #include "ItemBase.generated.h"
 
 class UItemType;
@@ -11,13 +12,15 @@ class UItemType;
  * The base class for all items with callbacks for inventory events. 
  */
 UCLASS(Abstract, Blueprintable, BlueprintType, EditInlineNew)
-class LAMBDASNAILINVENTORYSYSTEM_API UItemBase : public UObject
+class LAMBDASNAILINVENTORYSYSTEM_API UItemBase : public UReplicatedObject
 {
 	GENERATED_BODY()
 	
 public:
 	UItemBase();
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UItemType* GetItemData() const;
 
@@ -35,11 +38,7 @@ public:
 	 */
 	bool IsSameItem(UItemBase const& Other) const;
 
-	/**
-	 * Allows the item to create its own visual representation when being spawned as part of a pickup
-	 * @param Actor 
-	 */
-	virtual void CreateComponentForPickup(AActor* Actor) const;
+	void ChangeOwner(AActor* NewOwner);
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

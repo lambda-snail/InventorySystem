@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "InventoryWidget.generated.h"
 
-class UInventoryEntry;
+class UItemSlotInstance;
 class UListView;
 class UWrapBox;
 class UTileView;
@@ -42,7 +42,7 @@ protected:
 	// UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	// int NumColumns { 5 };
 	
-	TArray<UInventoryEntry*> Items;
+	TArray<UItemSlotInstance*> Items;
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UListView> InventoryView;
