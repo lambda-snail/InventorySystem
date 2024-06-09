@@ -99,31 +99,13 @@ public:
 	
 	ISubobjectReplicator* ParentReplicator;
 
-	FORCEINLINE void SetData(UItemBase* NewItem, int ItemCount = 1)
-	{
-		if(ParentReplicator and Item)
-		{
-			ParentReplicator->RemoveReplicatedObject(Item);
-		}
-		
-		Item = NewItem;
-		Count = ItemCount;
-
-		if(NewItem)
-		{
-			NewItem->ChangeOwner(GetOwner());
-			if(ParentReplicator)
-			{
-				ParentReplicator->AddReplicatedObject(Item);	
-			}
-		}
-	}
+	void SetData(UItemBase* NewItem, int ItemCount = 1);
 
 	FORCEINLINE UItemBase* GetItem() const { return Item; };
 	
 	void ResetData()
 	{
-		if(ParentReplicator and Item)
+		if(ParentReplicator and GetOwner()->HasAuthority() and Item)
 		{
 			ParentReplicator->RemoveReplicatedObject(Item);
 		}
@@ -141,7 +123,7 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	FORCEINLINE virtual void BeginDestroy() override
 	{
-		if(ParentReplicator and Item)
+		if(ParentReplicator and GetOwner()->HasAuthority() and Item)
 		{
 			ParentReplicator->RemoveReplicatedObject(Item);
 		}

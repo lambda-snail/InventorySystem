@@ -22,10 +22,12 @@ void UInventoryComponent::BeginPlay()
 		for (uint32 i = 0; i < InventoryCapacity; ++i)
 		{
 			UItemSlotInstance* Slot = NewObject<UItemSlotInstance>(GetOwner(), UItemSlotInstance::StaticClass());
+			Slot->ParentReplicator = this;
 			Slot->SetData(nullptr, 0);
 			Slot->Index = i;
 		
 			Items.Add(Slot);
+			AddReplicatedSubObject(Slot);
 		}	
 	}
 	
@@ -274,7 +276,6 @@ void UInventoryComponent::OnRep_Items()
 		if(Slot)
 		{
 			ItemCount += Slot->IsEmpty() ? 0 : 1;
-			Slot->ParentReplicator = this;
 		}
 	}
 
@@ -303,8 +304,25 @@ void UInventoryComponent::RemoveReplicatedObject(UReplicatedObject* Object)
 }
 
 
+void UItemSlotInstance::SetData(UItemBase* NewItem, int ItemCount)
+{
+	if(ParentReplicator and GetOwner()->HasAuthority() and Item)
+	{
+		ParentReplicator->RemoveReplicatedObject(Item);
+	}
+		
+	Item = NewItem;
+	Count = ItemCount;
 
-
+	if(NewItem)
+	{
+		NewItem->ChangeOwner(GetOwner());
+		if(ParentReplicator and GetOwner()->HasAuthority() and NewItem)
+		{
+			ParentReplicator->AddReplicatedObject(NewItem);	
+		}
+	}
+}
 
 void UItemSlotInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
