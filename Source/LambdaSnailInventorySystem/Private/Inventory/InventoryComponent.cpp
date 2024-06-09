@@ -26,7 +26,6 @@ void UInventoryComponent::BeginPlay()
 			Slot->Index = i;
 		
 			Items.Add(Slot);
-			AddReplicatedSubObject(Slot);
 		}	
 	}
 	
@@ -101,8 +100,6 @@ EItemAddResult UInventoryComponent::TryAddItem(UItemBase* Item, uint32 Slot)
 		Items[Slot]->SetData(Item, 1);
 		++ItemCount;
 
-		AddReplicatedSubObject(Item);
-		
 		OnInventoryChanged.Broadcast();
 		return EItemAddResult::Success;
 	}
@@ -276,7 +273,8 @@ void UInventoryComponent::OnRep_Items()
 	{
 		if(Slot)
 		{
-			ItemCount += Slot->IsEmpty() ? 0 : 1;	
+			ItemCount += Slot->IsEmpty() ? 0 : 1;
+			Slot->ParentReplicator = this;
 		}
 	}
 
@@ -294,6 +292,15 @@ void UInventoryComponent::OnRep_InventoryCapacity()
 	}
 }
 
+void UInventoryComponent::AddReplicatedObject(UReplicatedObject* Object)
+{
+	AddReplicatedSubObject(Object);
+}
+
+void UInventoryComponent::RemoveReplicatedObject(UReplicatedObject* Object)
+{
+	RemoveReplicatedSubObject(Object);
+}
 
 
 
@@ -308,10 +315,5 @@ void UItemSlotInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	DOREPLIFETIME_CONDITION(ThisClass, Index, COND_InitialOnly);
 	DOREPLIFETIME_CONDITION(ThisClass, SlotTag, COND_InitialOnly);
-	DOREPLIFETIME_CONDITION(ThisClass, OwningInventoryComponent, COND_InitialOnly);
-}
-
-void UItemSlotInstance::OnRep_Item()
-{
-	GEngine->AddOnScreenDebugMessage(23, 2.f, FColor::Red, "Item Replicated!");
+	//DOREPLIFETIME_CONDITION(ThisClass, OwningInventoryComponent, COND_InitialOnly);
 }

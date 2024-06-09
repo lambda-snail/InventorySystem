@@ -5,12 +5,14 @@
 #include "CoreMinimal.h"
 #include "Inventory.h"
 #include "ItemBase.h"
+#include "Network/SubobjectReplicator.h"
 #include "Components/ActorComponent.h"
 #include "Network/ReplicatedObject.h"
 #include "InventoryComponent.generated.h"
 
 class UItemBase;
 class UInventoryComponent;
+
 // TODO: add type of change as parameter?
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryChangedDelegate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryInitializedDelegate);
@@ -94,18 +96,26 @@ public:
 	// Determines which items are compatible with this slot. If the tag is empty, all items are allowed.
 	UPROPERTY(Replicated)
 	FGameplayTag SlotTag;
-
-	UPROPERTY(Replicated)
-	UInventoryComponent* OwningInventoryComponent;
+	
+	ISubobjectReplicator* ParentReplicator;
 
 	FORCEINLINE void SetData(UItemBase* NewItem, int ItemCount = 1)
 	{
+		if(ParentReplicator and Item)
+		{
+			ParentReplicator->RemoveReplicatedObject(Item);
+		}
+		
 		Item = NewItem;
 		Count = ItemCount;
 
 		if(NewItem)
 		{
-			NewItem->ChangeOwner(GetOwner());			
+			NewItem->ChangeOwner(GetOwner());
+			if(ParentReplicator)
+			{
+				ParentReplicator->AddReplicatedObject(Item);	
+			}
 		}
 	}
 
@@ -113,6 +123,11 @@ public:
 	
 	void ResetData()
 	{
+		if(ParentReplicator and Item)
+		{
+			ParentReplicator->RemoveReplicatedObject(Item);
+		}
+		
 		Item = nullptr;
 		Count = 0;
 	}
@@ -124,16 +139,22 @@ public:
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	FORCEINLINE virtual void BeginDestroy() override
+	{
+		if(ParentReplicator and Item)
+		{
+			ParentReplicator->RemoveReplicatedObject(Item);
+		}
 
-	UPROPERTY(ReplicatedUsing=OnRep_Item)
-	TObjectPtr<UItemBase> Item;
+		Super::BeginDestroy();
+	}
 	
-	UFUNCTION()
-	void OnRep_Item();
+	UPROPERTY(Replicated)
+	TObjectPtr<UItemBase> Item;
 };
 
 UCLASS(ClassGroup=Inventory, hidecategories=(Object,LOD,Lighting,Transform,Sockets,TextureStreaming), editinlinenew, meta=(BlueprintSpawnableComponent))
-class LAMBDASNAILINVENTORYSYSTEM_API UInventoryComponent : public UActorComponent
+class LAMBDASNAILINVENTORYSYSTEM_API UInventoryComponent : public UActorComponent, public ISubobjectReplicator
 {
 	GENERATED_BODY()
 
@@ -175,6 +196,9 @@ public:
 	TArray<TObjectPtr<UItemSlotInstance>> GetItems() const;
 	void ForEachItemInstance(TFunction<void(UItemBase const&, uint32 const Count, uint32 const Slot)> const& Callback) const;
 
+	void AddReplicatedObject(UReplicatedObject* Object);
+	void RemoveReplicatedObject(UReplicatedObject* Object);
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;

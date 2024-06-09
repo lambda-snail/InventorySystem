@@ -5,7 +5,6 @@
 
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
-#include "Engine/StaticMeshActor.h"
 #include "Inventory/InventoryComponent.h"
 #include "Inventory/ItemBase.h"
 #include "Inventory/Ui/InventoryDragDropOperation.h"
