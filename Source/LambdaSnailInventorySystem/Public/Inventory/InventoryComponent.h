@@ -196,8 +196,8 @@ public:
 	TArray<TObjectPtr<UItemSlotInstance>> GetItems() const;
 	void ForEachItemInstance(TFunction<void(UItemBase const&, uint32 const Count, uint32 const Slot)> const& Callback) const;
 
-	void AddReplicatedObject(UReplicatedObject* Object);
-	void RemoveReplicatedObject(UReplicatedObject* Object);
+	virtual void AddReplicatedObject(UReplicatedObject* Object) override;
+	virtual void RemoveReplicatedObject(UReplicatedObject* Object) override;
 	
 protected:
 	virtual void BeginPlay() override;
