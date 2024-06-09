@@ -22,12 +22,12 @@ void UItemWidget::NativeOnListItemObjectSet(UObject* ListItemObject)
 void UItemWidget::SetItem(UItemBase const* Item, int Count)
 {
 	this->ItemInstance = Item;
-
+	
 	DisplayCount->SetText(FText::AsNumber(Count));
-	if(Item and Item->GetItemData())
+	if(UItemType const* ItemData = Item->GetItemData())
 	{
-		Image->SetBrush(Item->GetItemData()->Icon);
-		DisplayName->SetText(Item->GetItemData()->DisplayName);
+		Image->SetBrush(ItemData->Icon);
+		DisplayName->SetText(ItemData->DisplayName);
 	}
 
 	bIsOccupied = true;

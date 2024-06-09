@@ -212,7 +212,7 @@ TArray<UInventoryEntry*> UInventoryComponent::GetItems() const
 		auto Entry = NewObject<UInventoryEntry>();
 		Entry->Item = Items[i].Item;
 		Entry->Index = Items[i].Index;
-		Entry->Index = Items[i].Count;
+		Entry->Count = Items[i].Count;
 		
 		Entries.Add(Entry);
 	}
