@@ -19,5 +19,5 @@ class LAMBDASNAILINVENTORYSYSTEM_API IInventoryActor
 	GENERATED_BODY()
 
 public:
-	FORCEINLINE virtual UInventoryComponent* GetInventoryComponent() const = 0;
+	virtual UInventoryComponent* GetInventoryComponent() const = 0;
 };

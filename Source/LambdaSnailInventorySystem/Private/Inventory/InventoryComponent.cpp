@@ -2,10 +2,10 @@
 
 #include "Inventory/InventoryComponent.h"
 
-#include "Engine/ActorChannel.h"
+#include "Inventory/InventoryLog.h"
 #include "Inventory/ItemBase.h"
+#include "Logging/StructuredLog.h"
 #include "Net/UnrealNetwork.h"
-
 
 UInventoryComponent::UInventoryComponent()
 {
@@ -28,13 +28,14 @@ void UInventoryComponent::BeginPlay()
 		
 			Items.Add(Slot);
 			AddReplicatedSubObject(Slot);
-		}	
+		}
+
+		// For clients, we need to broadcast this the first time the inventory is replicated
+		bIsInitialized = true;
+		OnInventoryInitialized.Broadcast();
 	}
 	
 	Super::BeginPlay();
-	bIsInitialized = true;
-
-	OnInventoryInitialized.Broadcast();
 }
 
 void UInventoryComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -53,6 +54,7 @@ void UInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
 	DOREPLIFETIME(ThisClass, Items);
 	DOREPLIFETIME(ThisClass, InventoryCapacity);
+	DOREPLIFETIME(ThisClass, ItemCount);
 }
 
 uint32 UInventoryComponent::GetCapacity() const
@@ -279,7 +281,12 @@ void UInventoryComponent::OnRep_Items()
 		}
 	}
 
-	if(OnInventoryChanged.IsBound())
+	if(not bIsInitialized)
+	{
+		bIsInitialized = true;
+		OnInventoryInitialized.Broadcast();
+	}
+	else if(OnInventoryChanged.IsBound())
 	{
 		OnInventoryChanged.Broadcast();
 	}
@@ -334,4 +341,9 @@ void UItemSlotInstance::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION(ThisClass, Index, COND_InitialOnly);
 	DOREPLIFETIME_CONDITION(ThisClass, SlotTag, COND_InitialOnly);
 	//DOREPLIFETIME_CONDITION(ThisClass, OwningInventoryComponent, COND_InitialOnly);
+}
+
+void UItemSlotInstance::OnRep_Item()
+{
+	UE_LOGFMT(LambdaSnailInventory, Warning, "Item replicated: {Name}", Item ? Item->GetItemData()->DisplayName.ToString() : "NULL");
 }

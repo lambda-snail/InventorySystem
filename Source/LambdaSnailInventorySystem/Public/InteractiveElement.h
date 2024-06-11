@@ -4,7 +4,7 @@
 #include "UObject/Interface.h"
 #include "InteractiveElement.generated.h"
 
-UINTERFACE(MinimalAPI)
+UINTERFACE(MinimalAPI, Blueprintable)
  class UInteractiveElement : public UInterface
  {
  	GENERATED_BODY()
@@ -18,7 +18,9 @@ class LAMBDASNAILINVENTORYSYSTEM_API IInteractiveElement
  GENERATED_BODY()
 
 public:
- FORCEINLINE virtual bool CanInteract() const = 0;
- virtual void Interact(AActor* Instigator) = 0;
+ UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+ bool CanInteract() const;
+ UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+ void Interact(AActor* Interactor);
 };
 

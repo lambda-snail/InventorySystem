@@ -131,8 +131,10 @@ protected:
 		Super::BeginDestroy();
 	}
 	
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing=OnRep_Item)
 	TObjectPtr<UItemBase> Item;
+	UFUNCTION()
+	void OnRep_Item();
 };
 
 UCLASS(ClassGroup=Inventory, hidecategories=(Object,LOD,Lighting,Transform,Sockets,TextureStreaming), editinlinenew, meta=(BlueprintSpawnableComponent))
@@ -193,7 +195,8 @@ protected:
 	// Inventory capacity is the number of items the inventory can hold
 	UPROPERTY(EditAnywhere, ReplicatedUsing=OnRep_InventoryCapacity)
 	uint32 InventoryCapacity { 10 };
-	
+
+	UPROPERTY(Replicated)
 	uint32 ItemCount { 0 };
 
 	bool bIsInitialized { false };
