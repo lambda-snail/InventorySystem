@@ -28,13 +28,11 @@ public:
 	
 protected:
 	virtual void BeginPlay() override;
+	
+	virtual void OnPickup(TScriptInterface<IInventoryActor> const& PickupCharacter);
 
-	// TODO: We need an "item" interface maybe, that will have behavior for things such as pickup and throw etc
-	UFUNCTION(BlueprintCallable)
-	virtual void OnPickup(TScriptInterface<IInventoryActor> PickupCharacter);
-
-	FORCEINLINE virtual bool CanInteract() const override;
-	virtual void Interact(AActor* Interactor) override;
+	virtual bool CanInteract_Implementation() const override;
+	virtual void Interact_Implementation(AActor* Interactor) override;
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> Root;

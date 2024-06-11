@@ -50,7 +50,7 @@ void APickup::BeginPlay()
 	Super::BeginPlay();
 }
 
-void APickup::OnPickup(TScriptInterface<IInventoryActor> PickupCharacter)
+void APickup::OnPickup(TScriptInterface<IInventoryActor> const& PickupCharacter)
 {
 	UInventoryComponent* Inventory = PickupCharacter->GetInventoryComponent();
 	
@@ -68,12 +68,12 @@ void APickup::OnPickup(TScriptInterface<IInventoryActor> PickupCharacter)
 	}
 }
 
-bool APickup::CanInteract() const
+bool APickup::CanInteract_Implementation() const
 {
 	return true;
 }
 
-void APickup::Interact(AActor* Interactor)
+void APickup::Interact_Implementation(AActor* Interactor)
 {
 	if(Interactor->Implements<UInventoryActor>())
 	{
@@ -81,6 +81,6 @@ void APickup::Interact(AActor* Interactor)
 	}
 	else
 	{
-		UE_LOGFMT(LambdaSnailInventory, Warning, "Pickup ({}) received an interaction from {}, but this actoer is not an IItemUser", GetName(), Interactor->GetName());
+		UE_LOGFMT(LambdaSnailInventory, Warning, "Pickup ({This}) received an interaction from {Object}, but this actoer is not an IItemUser", GetName(), Interactor->GetName());
 	}
 }
