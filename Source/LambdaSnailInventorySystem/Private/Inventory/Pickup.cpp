@@ -84,3 +84,8 @@ void APickup::Interact_Implementation(AActor* Interactor)
 		UE_LOGFMT(LambdaSnailInventory, Warning, "Pickup ({This}) received an interaction from {Object}, but this actoer is not an IItemUser", GetName(), Interactor->GetName());
 	}
 }
+
+bool APickup::IsLocalInteraction_Implementation() const
+{
+	return false;
+}

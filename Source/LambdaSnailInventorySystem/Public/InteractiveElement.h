@@ -22,5 +22,11 @@ public:
  bool CanInteract() const;
  UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
  void Interact(AActor* Interactor);
+
+ /**
+  * Returns true if the caller should first ensure that the call is made on the client.
+  */
+ UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+ bool IsLocalInteraction() const;
 };
 

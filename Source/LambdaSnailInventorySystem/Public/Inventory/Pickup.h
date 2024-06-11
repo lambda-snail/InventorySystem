@@ -33,6 +33,7 @@ protected:
 
 	virtual bool CanInteract_Implementation() const override;
 	virtual void Interact_Implementation(AActor* Interactor) override;
+	virtual bool IsLocalInteraction_Implementation() const override;
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> Root;
@@ -42,11 +43,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Pickup")
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
-	
-	// If true, the player will not pick up the item immediately on overlap, but will instead be given an interaction
-	// prompt asking if the item should be picked up.
-	UPROPERTY(EditAnywhere, Category = "Trigger")
-	bool bInteractiveTrigger { true };
+
 
 	// The collision channel to register to when the pickup has authority
 	UPROPERTY(EditAnywhere, Category = "Trigger")
