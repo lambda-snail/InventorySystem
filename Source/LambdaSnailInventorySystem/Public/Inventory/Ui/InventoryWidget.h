@@ -34,7 +34,7 @@ public:
 	void SetOwnerAndInitialize(UInventoryComponent* InventoryComponent);
 	
 	UFUNCTION(BlueprintCallable)
-	void Init();
+	virtual void Init();
 protected:
 	virtual void NativeConstruct() override;
 
