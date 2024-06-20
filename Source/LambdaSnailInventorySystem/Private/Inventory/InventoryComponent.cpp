@@ -4,6 +4,7 @@
 
 #include "Inventory/InventoryLog.h"
 #include "Inventory/ItemBase.h"
+#include "Inventory/Actions/InventoryAction.h"
 #include "Logging/StructuredLog.h"
 #include "Net/UnrealNetwork.h"
 
@@ -309,7 +310,6 @@ void UInventoryComponent::RemoveReplicatedObject(UReplicatedObject* Object)
 {
 	RemoveReplicatedSubObject(Object);
 }
-
 
 void UItemSlotInstance::SetData(UItemBase* NewItem, int ItemCount)
 {

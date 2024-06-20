@@ -5,6 +5,7 @@
 
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Inventory/InventoryActor.h"
 #include "Inventory/InventoryComponent.h"
 #include "Inventory/ItemBase.h"
 #include "Inventory/Ui/InventoryDragDropOperation.h"
@@ -14,11 +15,23 @@ void UItemWidget::NativeOnListItemObjectSet(UObject* ListItemObject)
 	if(UItemSlotInstance* Entry = Cast<UItemSlotInstance>(ListItemObject))
 	{
 		SetItem(Entry->GetItem(), Entry->Count);
+
+		UInventoryComponent* Inventory = Cast<UInventoryComponent>(Entry->GetOuter());
+		if(not Inventory and Entry->GetOwner()->Implements<UInventoryActor>())
+		{
+			Inventory = Cast<IInventoryActor>(Entry->GetOwner())->GetInventoryComponent();
+		}
+		
+		if(Inventory)
+		{
+			InventoryComponent = Inventory;
+			InventoryActions = ItemInstance->GetItemActions();
+		}
 	}
 }
 
 // TODO: Remove and move to native set
-void UItemWidget::SetItem(UItemBase const* Item, int Count)
+void UItemWidget::SetItem(UItemBase* Item, int Count)
 {
 	this->ItemInstance = Item;
 	
@@ -28,7 +41,7 @@ void UItemWidget::SetItem(UItemBase const* Item, int Count)
 		Image->SetBrush(ItemData->Icon);
 		DisplayName->SetText(ItemData->DisplayName);
 	}
-
+	
 	bIsOccupied = true;
 	OnSetItem();
 }
@@ -92,9 +105,4 @@ bool UItemWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent
 	}
 
 	return false;
-}
-
-void UItemWidget::NativeConstruct()
-{
-	Super::NativeConstruct();
 }

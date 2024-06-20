@@ -81,7 +81,7 @@ struct FItemTransferRequest
  * Internally items in the inventory are stored in an FItemSlotInstance that keeps track the item and metadata related
  * to storing that item.
  */
-UCLASS()
+UCLASS(BlueprintType)
 class UItemSlotInstance : public UReplicatedObject
 {
 	GENERATED_BODY()
@@ -101,6 +101,7 @@ public:
 
 	void SetData(UItemBase* NewItem, int ItemCount = 1);
 
+	UFUNCTION(BlueprintCallable)
 	FORCEINLINE UItemBase* GetItem() const { return Item; };
 	
 	void ResetData()
@@ -114,6 +115,7 @@ public:
 		Count = 0;
 	}
 
+	UFUNCTION(BlueprintCallable)
 	bool IsEmpty() const
 	{
 		return not Item || Count == 0;
@@ -182,7 +184,7 @@ public:
 
 	virtual void AddReplicatedObject(UReplicatedObject* Object) override;
 	virtual void RemoveReplicatedObject(UReplicatedObject* Object) override;
-	
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -200,7 +202,7 @@ protected:
 	uint32 ItemCount { 0 };
 
 	bool bIsInitialized { false };
-
+	
 private:
 	UFUNCTION()
 	void OnRep_Items();

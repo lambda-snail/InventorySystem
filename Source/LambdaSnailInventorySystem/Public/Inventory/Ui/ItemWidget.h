@@ -27,7 +27,7 @@ public:
 
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 	
-	void SetItem(UItemBase const* Item, int Count);
+	void SetItem(UItemBase* Item, int Count);
 	void UnsetItem();
 
 	/**
@@ -42,12 +42,10 @@ public:
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	
 protected:
-	TObjectPtr<UItemBase const> ItemInstance;
+	TObjectPtr<UItemBase> ItemInstance;
 
 	bool bIsOccupied { false };
 	
-	virtual void NativeConstruct() override;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FSlateBrush Icon;
 	
@@ -65,6 +63,9 @@ protected:
 	
 	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr<UInventoryComponent> InventoryComponent;
+
+	UPROPERTY(BlueprintReadOnly);
+	TArray<UInventoryAction*> InventoryActions;
 	
 	uint32 ItemIndex;
 	

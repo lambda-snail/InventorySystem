@@ -6,6 +6,7 @@
 #include "Network/ReplicatedObject.h"
 #include "ItemBase.generated.h"
 
+class UInventoryAction;
 class UItemType;
 
 /**
@@ -23,7 +24,9 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UItemType* GetItemData() const;
-
+	
+	virtual TArray<TObjectPtr<UInventoryAction>> GetItemActions();
+	
 	// Called when an item is added to the inventory
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void OnPickup(AActor* Owner);
@@ -43,4 +46,11 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UItemType> ItemMetadata;
+
+	// Item actions specific for this type of item (items with same metadata can have different actions)
+	// UPROPERTY(EditAnywhere)
+	// TArray<TSubclassOf<UInventoryAction>> PerTypeItemActionDefinitions;
+
+	UPROPERTY()
+	TArray<TObjectPtr<UInventoryAction>> ItemActionsCache;
 };

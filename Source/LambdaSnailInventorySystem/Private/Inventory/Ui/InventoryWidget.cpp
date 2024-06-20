@@ -3,6 +3,7 @@
 #include "Inventory/Ui/InventoryWidget.h"
 
 #include "Components/ListView.h"
+#include "Components/TileView.h"
 #include "Inventory/Ui/ItemWidget.h"
 
 #include "Components/UniformGridPanel.h"
@@ -19,6 +20,17 @@ void UInventoryWidget::SetOwnerAndInitialize(UInventoryComponent* InventoryCompo
 	else
 	{
 		OwningComponent->OnInventoryInitialized.AddUniqueDynamic(this, &UInventoryWidget::Init);
+	}
+}
+
+void UInventoryWidget::TileView_OnItemSelectionChange(UObject* Item)
+{
+	if(UItemSlotInstance* InventorySlot = Cast<UItemSlotInstance>(Item))
+	{
+		if(InventorySlot->GetItem())
+		{
+			InventoryActionsGrid->SetListItems<TObjectPtr<UInventoryAction>>(InventorySlot->GetItem()->GetItemActions());	
+		}
 	}
 }
 
@@ -48,6 +60,8 @@ void UInventoryWidget::Init()
 		
 		OwningComponent->OnInventoryChanged.AddDynamic(this, &UInventoryWidget::ReloadInventory);
 		OwningComponent->OnInventoryInitialized.RemoveDynamic(this, &UInventoryWidget::Init);
+
+		InventoryView->OnItemSelectionChanged().AddUObject(this, &ThisClass::TileView_OnItemSelectionChange);
 	}
 }
 
@@ -60,7 +74,7 @@ void UInventoryWidget::ReloadInventory()
 {
 	Items = OwningComponent->GetItems();
 	InventoryView->SetListItems<UItemSlotInstance*>(Items);
-	
+
 	// for(auto* Item : Items)
 	// {
 	// 	Item->UnsetItem();

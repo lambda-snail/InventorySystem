@@ -4,6 +4,7 @@
 #include "Inventory\ItemBase.h"
 
 #include "Inventory/Inventory.h"
+#include "Inventory/Actions/InventoryAction.h"
 
 UItemBase::UItemBase()
 {
@@ -44,4 +45,21 @@ void UItemBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 	{
 		BPClass->GetLifetimeBlueprintReplicationList(OutLifetimeProps);
 	}
+}
+
+TArray<TObjectPtr<UInventoryAction>> UItemBase::GetItemActions()
+{
+	if(ItemActionsCache.Num() > 0)
+	{
+		return ItemActionsCache;
+	}
+
+	for(auto ItemDefinition : ItemMetadata->InventoryActionDefinitions)
+	{
+		UInventoryAction* NewAction = NewObject<UInventoryAction>(this->GetOwner(), ItemDefinition.Get());
+		NewAction->SetItem(this);
+		ItemActionsCache.Add(NewAction);
+	}
+
+	return ItemActionsCache;
 }

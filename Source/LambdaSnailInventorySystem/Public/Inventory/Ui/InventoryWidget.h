@@ -32,6 +32,8 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable)
 	void SetOwnerAndInitialize(UInventoryComponent* InventoryComponent);
+
+	void TileView_OnItemSelectionChange(UObject* Item);
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void Init();
@@ -46,9 +48,10 @@ protected:
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UListView> InventoryView;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	TObjectPtr<UTileView> InventoryActionsGrid;
 	
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	// TSubclassOf<UItemWidget> GridItemWidgetClass;
 private:
 
 	UFUNCTION()

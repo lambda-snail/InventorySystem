@@ -5,6 +5,8 @@
 #include "Engine/DataAsset.h"
 #include "Inventory.generated.h"
 
+class UInventoryAction;
+
 /**
  * Data asset that describes things common to all inventory items of a certain type,
  * such as name, icon etc.
@@ -22,19 +24,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="UI")
 	FSlateBrush Icon;
 
-	// The type used to spawn the object in the world
-	//UPROPERTY(EditAnywhere, Instanced)
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly) // TODO: Should be static mesh?
-	//TObjectPtr<class UStaticMesh> PhysicalType;
-
 	// Determines if the item can stack or not
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Behavior")
 	bool bIsStackable { true };
 
 	// Determines how many items can be in one stack, if bIsStackable is true
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Behavior")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Behavior", meta = (EditConditionHides=bIsStackable))
 	int MaxStackSize { 10 };
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Behavior")
 	FGameplayTagContainer ItemTags;
+
+	UPROPERTY(EditDefaultsOnly)
+	TArray<TSubclassOf<UInventoryAction>> InventoryActionDefinitions;
 };
