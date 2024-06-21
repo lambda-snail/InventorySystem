@@ -115,6 +115,24 @@ EItemAddResult UInventoryComponent::TryAddItem(UItemBase* Item, uint32 Slot)
 	}
 }
 
+bool UInventoryComponent::TryRemoveItem(UItemBase const* Item)
+{
+	for(UItemSlotInstance* Slot : Items)
+	{
+		if(Slot->GetItem() == Item)
+		{
+			Slot->ResetData();
+			if(OnInventoryChanged.IsBound())
+			{
+				OnInventoryChanged.Broadcast();		
+			}
+			return true;
+		}
+	}
+
+	return false;
+}
+
 EItemTransferResult UInventoryComponent::TryMoveItem(FItemTransferRequest const& TransferRequest)
 {
 	auto& SourceInventory = TransferRequest.SourceInventoryComponent;

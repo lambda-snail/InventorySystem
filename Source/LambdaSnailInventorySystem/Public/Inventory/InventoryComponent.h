@@ -164,6 +164,11 @@ public:
 	virtual EItemAddResult TryAddItem(UItemBase* Item);
 	virtual EItemAddResult TryAddItem(UItemBase* Item, uint32 Slot);
 
+	// Attempts to remove the item from the inventory if it is contained. This wil only reset the slot that
+	// contains the item, it will not drop the item on the ground.
+	UFUNCTION(BlueprintCallable)
+	virtual bool TryRemoveItem(UItemBase const* Item);
+	
 	// RPC Server
 	virtual EItemTransferResult TryMoveItem(FItemTransferRequest const& TransferRequest);
 
