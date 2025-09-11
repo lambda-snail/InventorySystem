@@ -1,2 +1,0 @@
-﻿#include "InteractiveElement.h"
-
