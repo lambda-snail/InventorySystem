@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "InventorySubsystem.generated.h"
 
@@ -16,4 +17,15 @@ class LAMBDASNAILINVENTORYSYSTEM_API UInventorySubsystem : public UGameInstanceS
 
 public:
 	static UInventorySubsystem* Get(UObject const* WorldContextObject);
+
+	//~Begin USubsystem Interface
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	virtual void Deinitialize() override;
+	//~End USubsystem Interface
+
+private:
+	FGameplayTagContainer ItemTags{};
+
+	UPROPERTY(Transient)
+	TObjectPtr<UDataTable> ItemTable;
 };
