@@ -14,13 +14,16 @@ EAddItemResult UInventoryComponent::AddItemToInventory(TScriptInterface<IItemInt
 		return EAddItemResult::InventoryFull;
 	}
 
-	for (FItemRepresentation& ItemSlot : Items)
+	for (int32 SlotIndex = 0; SlotIndex < MaxItemCount; ++SlotIndex)
 	{
-		if (ItemSlot.IsEmpty())
+		FItemRepresentation& Slot = Items[SlotIndex];
+
+		if (Slot.IsEmpty())
 		{
-			ItemSlot.Count = 1;
-			ItemSlot.ItemDetails = Item->GetItemDetails();
+			Slot.Count = 1;
+			Slot.ItemDetails = Item->GetItemDetails();
 			Item->OnAddedToInventory();
+			OnItemAdded.Broadcast(Slot.ItemDetails.ItemClassId, Slot.ItemDetails.ItemInstanceId, SlotIndex);
 			return EAddItemResult::Success;
 		}
 	}
@@ -42,6 +45,7 @@ EAddItemResult UInventoryComponent::AddItemToInventorySlot(TScriptInterface<IIte
 		++Slot.Count;
 		Slot.ItemDetails = Item->GetItemDetails();
 		Item->OnAddedToInventory();
+		OnItemAdded.Broadcast(Slot.ItemDetails.ItemClassId, Slot.ItemDetails.ItemInstanceId, SlotIndex);
 		return EAddItemResult::Success;
 	}
 
@@ -67,8 +71,34 @@ void UInventoryComponent::SetMaxItemCount(int32 NewCount)
 {
 }
 
-void UInventoryComponent::ForeachItem(TFunction<void(int32 ItemClassID, int32 ItemInstanceID)> Callback) const
+void UInventoryComponent::ForeachSlot(TFunction<void(FName, int32, int32, int32)> const& Callback) const
 {
+	for (int32 Index = 0; Index < MaxItemCount; ++Index)
+	{
+		FItemRepresentation const& Slot = Items[Index];
+
+		Callback(
+			Slot.IsEmpty() ? FName() : Slot.ItemDetails.ItemClassId,
+			Slot.IsEmpty() ? 0 : Slot.ItemDetails.ItemInstanceId,
+			Slot.Count,
+			Index);
+	}
+}
+void UInventoryComponent::ForeachItem(TFunction<void(FName, int32, int32, int32)> const& Callback) const
+{
+	for (int32 Index = 0; Index < MaxItemCount; ++Index)
+	{
+		FItemRepresentation const& Slot = Items[Index];
+
+		if (not Slot.IsEmpty())
+		{
+			Callback(
+				Slot.ItemDetails.ItemClassId,
+				Slot.ItemDetails.ItemInstanceId,
+				Slot.Count,
+				Index);
+		}
+	}
 }
 
 // Called when the game starts

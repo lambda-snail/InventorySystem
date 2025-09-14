@@ -1,8 +1,8 @@
 ﻿#include "Inventory/InventorySubsystem.h"
 
 #include "Inventory/ItemDataRow.h"
-#include "Logging/InventoryLogging.h"
-#include "Settings/LambdaSnail_InventorySettings.h"
+#include "Inventory/Logging/InventoryLogging.h"
+#include "Inventory/Settings/LambdaSnail_InventorySettings.h"
 
 UInventorySubsystem* UInventorySubsystem::Get(UObject const* WorldContextObject)
 {

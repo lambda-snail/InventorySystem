@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "ItemDetails.h"
 #include "Components/ActorComponent.h"
+#include "Templates/Function.h"
 #include "InventoryComponent.generated.h"
 
 class IItemInterface;
@@ -17,6 +18,8 @@ enum struct EAddItemResult : uint8
 	/** Attempted to add an item to a negative slot or a slot beyond the limits of the inventory */
 	InvalidSlot
 };
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnItemAddedDelegate, FName, ItemClassId, int32, ItemInstanceId, int32, Index);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class LAMBDASNAILINVENTORYSYSTEM_API UInventoryComponent : public UActorComponent
@@ -42,7 +45,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetMaxItemCount(int32 NewCount);
 
-	void ForeachItem(TFunction<void(int32 ItemClassID, int32 ItemInstanceID)> Callback) const;
+	/** Execute logic for each slot in the inventory. If Count == 0 the slot is empty. */
+	void ForeachSlot(TFunction<void(FName, int32, int32, int32)> const& Callback) const;
+
+	/** Execute logic for each item in the inventory. Skips empty slots, so the Index parameter is not guaranteed to be contiguous. */
+	void ForeachItem(TFunction<void(FName, int32, int32, int32)> const& Callback) const;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnItemAddedDelegate OnItemAdded;
 
 protected:
 	//~ Begin UActorComponent Interface
