@@ -17,13 +17,16 @@ class LAMBDASNAILINVENTORYSYSTEM_API UInventoryWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void InitInventoryUI(class UInventoryComponent* InventoryComponent);
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Inventory")
+	void PostNativeInit();
+
 protected:
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadonly, Category = "Inventory")
 	TObjectPtr<UInventoryComponent> OwningComponent;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void ReloadInventory();
 };
