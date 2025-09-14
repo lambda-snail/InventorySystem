@@ -11,15 +11,10 @@ UAsyncAction_IterateInventory* UAsyncAction_IterateInventory::ForEachItem(UObjec
 		return nullptr;
 	}
 
-	if (Owner == nullptr)
-	{
-		return nullptr;
-	}
-
 	if (UWorld const* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull))
 	{
 		UAsyncAction_IterateInventory* Node = NewObject<UAsyncAction_IterateInventory>();
-		Node->InventoryComponent = Owner->GetInventory();
+		Node->InventoryComponent = IInventoryOwner::Execute_GetInventory(Owner.GetObject());
 
 		Node->RegisterWithGameInstance(World);
 		return Node;
@@ -36,12 +31,14 @@ void UAsyncAction_IterateInventory::Activate()
 
 	if (bShouldIncludeEmptySlots)
 	{
-		InventoryComponent->ForeachSlot(MoveTemp(Callback));
+		InventoryComponent->ForeachSlot(Callback);
 	}
 	else
 	{
-		InventoryComponent->ForeachItem(MoveTemp(Callback));
+		InventoryComponent->ForeachItem(Callback);
 	}
+
+	OnIterationComplete.Broadcast();
 
 	SetReadyToDestroy();
 }

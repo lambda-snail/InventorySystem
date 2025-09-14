@@ -1,5 +1,9 @@
 ﻿#include "Inventory/InventoryComponent.h"
 
+#if WITH_EDITOR
+	#include "Inventory/ItemDataRow.h"
+#endif
+
 #include "Inventory/ItemInterface.h"
 
 UInventoryComponent::UInventoryComponent()
@@ -21,8 +25,8 @@ EAddItemResult UInventoryComponent::AddItemToInventory(TScriptInterface<IItemInt
 		if (Slot.IsEmpty())
 		{
 			Slot.Count = 1;
-			Slot.ItemDetails = Item->GetItemDetails();
-			Item->OnAddedToInventory();
+			Slot.ItemDetails = IItemInterface::Execute_GetItemDetails(Item.GetObject());
+			IItemInterface::Execute_OnAddedToInventory(Item.GetObject());
 			OnItemAdded.Broadcast(Slot.ItemDetails.ItemClassId, Slot.ItemDetails.ItemInstanceId, SlotIndex);
 			return EAddItemResult::Success;
 		}
@@ -43,8 +47,9 @@ EAddItemResult UInventoryComponent::AddItemToInventorySlot(TScriptInterface<IIte
 	if (Slot.IsEmpty() or bSameType)
 	{
 		++Slot.Count;
-		Slot.ItemDetails = Item->GetItemDetails();
-		Item->OnAddedToInventory();
+
+		Slot.ItemDetails = IItemInterface::Execute_GetItemDetails(Item.GetObject());
+		IItemInterface::Execute_OnAddedToInventory(Item.GetObject());
 		OnItemAdded.Broadcast(Slot.ItemDetails.ItemClassId, Slot.ItemDetails.ItemInstanceId, SlotIndex);
 		return EAddItemResult::Success;
 	}
@@ -106,7 +111,28 @@ void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	Items.Reserve(MaxItemCount);
+	Items.AddZeroed(MaxItemCount);
+
+#if WITH_EDITOR
+
+	int32 Index = 0;
+	for (FDataTableRowHandle const& Row : DesignTimeItems)
+	{
+		if (Index >= MaxItemCount)
+		{
+			break;
+		}
+
+		FItemDataRow*		 RowData = Row.GetRow<FItemDataRow>("DesignTime");
+		FItemRepresentation& Item = Items[Index++];
+		Item.Count = 1;
+		Item.ItemDetails.ItemClassId = RowData->ID.GetTagName();
+	}
+#endif
+
+	bIsInitialized = true;
+	OnInitialized.Broadcast();
 }
 void UInventoryComponent::EndPlay(EEndPlayReason::Type const EndPlayReason)
 {

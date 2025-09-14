@@ -11,6 +11,8 @@ class UInventoryComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FItemIterator, FName, ItemClassID, int32, ItemInstanceID, int32, Count, int32, Index);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnIterationComplete);
+
 /**
  *
  */
@@ -32,6 +34,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FItemIterator ItemIterator;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnIterationComplete OnIterationComplete;
 
 private:
 	UPROPERTY(Transient)
