@@ -11,8 +11,8 @@ struct FItemDataRow : public FTableRowBase
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere)
-	FGameplayTag Name;
+	UPROPERTY(EditAnywhere, meta = (Categories = "Items"))
+	FGameplayTag ID;
 
 	UPROPERTY(EditAnywhere)
 	FText DisplayName;
@@ -23,12 +23,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	FSlateBrush Icon;
 
-	UPROPERTY(EditAnywhere, meta = (MustImplement = "IItemInterface"))
+	UPROPERTY(EditAnywhere, meta = (MustImplement = "ItemInterface"))
 	TSubclassOf<class AActor> OverrideItemActor;
 
-	//~ Begin FTableRowBase Interface
-	// #if WITH_EDITOR
-	// 	virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) const override;
-	// #endif
+//~ Begin FTableRowBase Interface
+#if WITH_EDITOR
+	virtual void OnDataTableChanged(const UDataTable* InDataTable, const FName InRowName) override;
+#endif
 	//~ End FTableRowBase Interface
 };

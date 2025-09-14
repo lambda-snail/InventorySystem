@@ -29,8 +29,8 @@ void UInventorySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 		UE_LOGFMT(InventorySystem, Display, "Loaded data table: {Table}", Path.ToString());
 
 		ItemTable->ForeachRow<FItemDataRow>(TEXT("Item Tags Initialization"), [this](FName const& Key, FItemDataRow const& ItemRow) {
-			ItemTags.AddLeafTag(ItemRow.Name);
-			UE_LOGFMT(InventorySystem, Display, "Processed tag {Tag}", ItemRow.Name.ToString());
+			ItemTags.AddLeafTag(ItemRow.ID);
+			UE_LOGFMT(InventorySystem, Display, "Processed tag {Tag}", ItemRow.ID.ToString());
 		});
 	}));
 }

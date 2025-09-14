@@ -11,7 +11,11 @@ UENUM()
 enum struct EAddItemResult : uint8
 {
 	Success,
-	InventoryFull
+	InventoryFull,
+	/** When adding an item to a slot, but the target slot is occupied by an item of incompatible type */
+	ItemTypeMismatch,
+	/** Attempted to add an item to a negative slot or a slot beyond the limits of the inventory */
+	InvalidSlot
 };
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
@@ -24,6 +28,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	EAddItemResult AddItemToInventory(TScriptInterface<IItemInterface> Item);
+
+	UFUNCTION(BlueprintCallable)
+	EAddItemResult AddItemToInventorySlot(TScriptInterface<IItemInterface> Item, int32 SlotIndex);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	int32 GetItemCount() const;
@@ -48,10 +55,16 @@ private:
 	{
 		FItemDetails ItemDetails{};
 		uint8		 Count{};
+
+		bool FORCEINLINE IsEmpty() const { return Count == 0; }
 	};
 
 	UPROPERTY(EditAnywhere)
 	int32 MaxItemCount{ 10 };
 
+	int32 CurrentItemCount{ 0 };
+
 	TArray<FItemRepresentation> Items{};
+
+	void FORCEINLINE ResetSlot(TArray<FItemRepresentation>::SizeType Index);
 };

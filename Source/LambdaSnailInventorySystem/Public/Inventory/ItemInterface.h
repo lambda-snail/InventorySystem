@@ -22,13 +22,16 @@ class LAMBDASNAILINVENTORYSYSTEM_API IItemInterface
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintNativeEvent)
 	void OnAddedToInventory();
 
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintNativeEvent)
 	void OnRemovedFromInventory();
 
+	UFUNCTION(BlueprintNativeEvent)
 	FItemDetails GetItemDetails() const;
-	void		 SetItemDetails(FItemDetails ItemDetails);
-	void		 ClearItemDetails();
+	UFUNCTION(BlueprintNativeEvent)
+	void SetItemDetails(FItemDetails ItemDetails);
+	UFUNCTION(BlueprintNativeEvent)
+	void ClearItemDetails();
 };

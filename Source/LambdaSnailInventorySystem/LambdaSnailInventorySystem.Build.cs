@@ -4,7 +4,7 @@ using UnrealBuildTool;
 
 public class LambdaSnailInventorySystem : ModuleRules
 {
-	public LambdaSnailInventorySystem(ReadOnlyTargetRules Target) : base(Target)
+	public LambdaSnailInventorySystem(ReadOnlyTargetRules target) : base(target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
@@ -47,6 +47,8 @@ public class LambdaSnailInventorySystem : ModuleRules
 				// ... add private dependencies that you statically link with here ...	
 			}
 		);
+
+		if (Target.bBuildEditor) PrivateDependencyModuleNames.Add("UnrealEd");
 
 
 		DynamicallyLoadedModuleNames.AddRange(
