@@ -10,6 +10,7 @@
 
 #include "InventorySubsystem.generated.h"
 
+class UItemDataAsset;
 struct FItemDataRow;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSubsystemInitializedDelegate);
@@ -44,6 +45,8 @@ public:
 
 private:
 	FGameplayTagContainer ItemTags{};
+
+	TMap<FGameplayTag, TSoftObjectPtr<UItemDataAsset>> ItemDataMap;
 
 	UPROPERTY(Transient)
 	TObjectPtr<UDataTable> ItemTable;
