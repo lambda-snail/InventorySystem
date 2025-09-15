@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Engine/DataTable.h"
+#include "Engine/Texture2D.h"
 #include "GameplayTagContainer.h"
 
 #include "ItemDataRow.generated.h"
@@ -20,8 +21,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "LambdaSnail|Inventory", BlueprintReadOnly)
 	FText Description{};
 
-	// UPROPERTY(EditAnywhere, Category = "LambdaSnail|Inventory", BlueprintReadOnly)
-	// FSlateBrush Icon{};
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "LambdaSnail|Inventory", meta = (DisplayThumbnail = "true", AllowedClasses = "/Script/Engine.Texture2D,/Script/Engine.MaterialInterface,/Script/Engine.SlateTextureAtlasInterface", DisallowedClasses = "/Script/MediaAssets.MediaTexture"))
+	UPROPERTY(EditAnywhere, Category = "LambdaSnail|Inventory", BlueprintReadOnly)
+	TSoftObjectPtr<UTexture2D> Icon;
 
 	UPROPERTY(EditAnywhere, Category = "LambdaSnail|Inventory", BlueprintReadOnly, meta = (MustImplement = "ItemInterface"))
 	TSubclassOf<class AActor> OverrideItemActor;
