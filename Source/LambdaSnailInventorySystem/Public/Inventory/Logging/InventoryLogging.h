@@ -5,4 +5,4 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(InventorySystem, Display, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogInventory, Display, All);

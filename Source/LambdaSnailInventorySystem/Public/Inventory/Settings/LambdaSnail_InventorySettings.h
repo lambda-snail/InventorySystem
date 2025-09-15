@@ -18,6 +18,9 @@ class LAMBDASNAILINVENTORYSYSTEM_API ULambdaSnail_InventorySettings : public UDe
 public:
 	explicit ULambdaSnail_InventorySettings(FObjectInitializer const& Initializer);
 
-	UPROPERTY(Config, EditAnywhere, Category = "Inventory", meta = (ForceInlineRow, AllowedClasses = "DataTable", RequiredAssetDataTags = "RowStructure=/Script/LambdaSnailInventorySystem.ItemDataRow"))
+	UPROPERTY(Config, EditAnywhere, Category = "LambdaSnail|Inventory", meta = (ForceInlineRow, AllowedClasses = "/Script/Engine.DataTable", RequiredAssetDataTags = "RowStructure=/Script/LambdaSnailInventorySystem.ItemDataRow"))
 	FSoftObjectPath InventoryTable;
+
+	UPROPERTY(Config, EditAnywhere, Category = "LambdaSnail|Inventory", meta = (MustImplement = "InventoryGridCellInterface"))
+	TSubclassOf<class UUserWidget> InventoryCellClass;
 };

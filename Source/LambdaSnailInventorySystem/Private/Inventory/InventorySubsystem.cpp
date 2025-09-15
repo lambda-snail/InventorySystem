@@ -14,6 +14,33 @@ UInventorySubsystem* UInventorySubsystem::Get(UObject const* WorldContextObject)
 
 	return nullptr;
 }
+void UInventorySubsystem::GetItemClassData(FName ItemID, FItemDataRow& OutDataRow, bool& Success) const
+{
+	FItemDataRow* DataRow = GetItemClassData(ItemID);
+	if (DataRow)
+	{
+		OutDataRow = *DataRow;
+		Success = true;
+		return;
+	}
+
+	Success = false;
+}
+
+FItemDataRow* UInventorySubsystem::GetItemClassData(FName const ItemID) const
+{
+	if (ItemTable)
+	{
+		return ItemTable->FindRow<FItemDataRow>(ItemID, "UInventorySubsystem");
+	}
+
+	return nullptr;
+}
+
+FItemDataRow* UInventorySubsystem::GetItemClassData(FGameplayTag const ItemID) const
+{
+	return ItemTable->FindRow<FItemDataRow>(ItemID.GetTagName(), "UInventorySubsystem");
+}
 
 void UInventorySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -26,12 +53,16 @@ void UInventorySubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 	DataTablePath.LoadAsync(FLoadSoftObjectPathAsyncDelegate::CreateLambda([this](FSoftObjectPath const& Path, UObject* Object) {
 		ItemTable = CastChecked<UDataTable>(Object);
-		UE_LOGFMT(InventorySystem, Display, "Loaded data table: {Table}", Path.ToString());
+		UE_LOGFMT(LogInventory, Display, "Loaded data table: {Table}", Path.ToString());
 
 		ItemTable->ForeachRow<FItemDataRow>(TEXT("Item Tags Initialization"), [this](FName const& Key, FItemDataRow const& ItemRow) {
 			ItemTags.AddLeafTag(ItemRow.ID);
-			UE_LOGFMT(InventorySystem, Display, "Processed tag {Tag}", ItemRow.ID.ToString());
+			UE_LOGFMT(LogInventory, Display, "Processed tag {Tag}", ItemRow.ID.ToString());
 		});
+
+		UE_LOGFMT(LogInventory, Display, "Inventory subsystem initialized");
+		bIsInitialized.store(true);
+		OnSubsystemInitialized.Broadcast();
 	}));
 }
 

@@ -24,9 +24,9 @@ class LAMBDASNAILINVENTORYSYSTEM_API UAsyncAction_IterateInventory : public UBlu
 public:
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", HidePin = "WorldContextObject", BlueprintInternalUseOnly = "true", DisplayName = "Iterate Over Items", Category = "Lambda Snail Blueprints"))
 	static UAsyncAction_IterateInventory* ForEachItem(
-		UObject const*					  WorldContextObject,
-		TScriptInterface<IInventoryOwner> Owner,
-		bool							  ShouldIncludeEmptySlots);
+		UObject const*		 WorldContextObject,
+		UInventoryComponent* InventoryComponent,
+		bool				 ShouldIncludeEmptySlots);
 
 	//~ Begin UBlueprintAsyncActionBase Interface
 	virtual void Activate() override;

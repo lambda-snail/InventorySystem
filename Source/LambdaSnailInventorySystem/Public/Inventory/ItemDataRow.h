@@ -5,25 +5,25 @@
 
 #include "ItemDataRow.generated.h"
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FItemDataRow : public FTableRowBase
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, meta = (Categories = "Items"))
-	FGameplayTag ID;
+	UPROPERTY(EditAnywhere, Category = "LambdaSnail|Inventory", BlueprintReadOnly, meta = (Categories = "Items"))
+	FGameplayTag ID{};
 
-	UPROPERTY(EditAnywhere)
-	FText DisplayName;
+	UPROPERTY(EditAnywhere, Category = "LambdaSnail|Inventory", BlueprintReadOnly)
+	FText DisplayName{};
 
-	UPROPERTY(EditAnywhere)
-	FText Description;
+	UPROPERTY(EditAnywhere, Category = "LambdaSnail|Inventory", BlueprintReadOnly)
+	FText Description{};
 
-	UPROPERTY(EditAnywhere)
-	FSlateBrush Icon;
+	// UPROPERTY(EditAnywhere, Category = "LambdaSnail|Inventory", BlueprintReadOnly)
+	// FSlateBrush Icon{};
 
-	UPROPERTY(EditAnywhere, meta = (MustImplement = "ItemInterface"))
+	UPROPERTY(EditAnywhere, Category = "LambdaSnail|Inventory", BlueprintReadOnly, meta = (MustImplement = "ItemInterface"))
 	TSubclassOf<class AActor> OverrideItemActor;
 
 //~ Begin FTableRowBase Interface

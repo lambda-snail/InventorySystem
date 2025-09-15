@@ -4,7 +4,7 @@
 
 #include "Inventory/InventoryComponent.h"
 #include "Inventory/InventoryOwner.h"
-UAsyncAction_IterateInventory* UAsyncAction_IterateInventory::ForEachItem(UObject const* WorldContextObject, TScriptInterface<IInventoryOwner> Owner, bool ShouldIncludeEmptySlots)
+UAsyncAction_IterateInventory* UAsyncAction_IterateInventory::ForEachItem(UObject const* WorldContextObject, UInventoryComponent* InventoryComponent, bool ShouldIncludeEmptySlots)
 {
 	if (not GEngine)
 	{
@@ -14,7 +14,8 @@ UAsyncAction_IterateInventory* UAsyncAction_IterateInventory::ForEachItem(UObjec
 	if (UWorld const* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull))
 	{
 		UAsyncAction_IterateInventory* Node = NewObject<UAsyncAction_IterateInventory>();
-		Node->InventoryComponent = IInventoryOwner::Execute_GetInventory(Owner.GetObject());
+		Node->InventoryComponent = InventoryComponent;
+		Node->bShouldIncludeEmptySlots = ShouldIncludeEmptySlots;
 
 		Node->RegisterWithGameInstance(World);
 		return Node;
