@@ -26,7 +26,7 @@ UAsyncAction_IterateInventory* UAsyncAction_IterateInventory::ForEachItem(UObjec
 
 void UAsyncAction_IterateInventory::Activate()
 {
-	auto Callback = [this](FName const ItemClassID, int32 const ItemInstanceID, int32 const Count, int32 const Index) {
+	auto Callback = [this](FGameplayTag const ItemClassID, int32 const ItemInstanceID, int32 const Count, int32 const Index) {
 		ItemIterator.Broadcast(ItemClassID, ItemInstanceID, Count, Index);
 	};
 

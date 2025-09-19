@@ -29,7 +29,7 @@ void UInventoryWidget::ReloadInventory()
 	TSubclassOf<UUserWidget>			  CellWidget = Settings->InventoryCellClass;
 
 	OwningComponent->ForeachSlot(
-		[this, CellWidget](FName ItemClassID, int32 ItemInstanceID, int32 Count, int32 Index) {
+		[this, CellWidget](FGameplayTag ItemClassID, int32 ItemInstanceID, int32 Count, int32 Index) {
 			UUserWidget* Cell = CreateWidget(GetOwningPlayer(), CellWidget);
 
 			if (Cell->Implements<UInventoryGridCellInterface>())

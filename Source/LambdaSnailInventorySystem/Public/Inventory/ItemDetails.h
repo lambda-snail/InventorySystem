@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "GameplayTagContainer.h"
 
 #include "ItemDetails.generated.h"
 
@@ -8,7 +9,7 @@ struct FItemDetails
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LambdaSnail|Inventory")
-	FName ItemClassId{};
+	FGameplayTag ItemClassId{};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LambdaSnail|Inventory")
 	int32 ItemInstanceId{ 0 };

@@ -26,11 +26,11 @@ class LAMBDASNAILINVENTORYSYSTEM_API UInventorySubsystem : public UGameInstanceS
 public:
 	static UInventorySubsystem* Get(UObject const* WorldContextObject);
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "LambdaSnail|Inventory")
-	void GetItemClassData(FName ItemID, FItemDataRow& OutDataRow, bool& Success) const;
+	// UFUNCTION(BlueprintCallable, BlueprintPure, Category = "LambdaSnail|Inventory")
+	// void GetItemClassData(FGameplayTag ItemID, TSoftObjectPtr<UItemDataAsset>& OutDataRow, bool& Success) const;
 
-	FItemDataRow* GetItemClassData(FGameplayTag const ItemID) const;
-	FItemDataRow* GetItemClassData(FName const ItemID) const;
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "LambdaSnail|Inventory")
+	TSoftObjectPtr<UItemDataAsset> GetItemClassData(FGameplayTag const ItemID) const;
 
 	//~Begin USubsystem Interface
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
@@ -47,9 +47,6 @@ private:
 	FGameplayTagContainer ItemTags{};
 
 	TMap<FGameplayTag, TSoftObjectPtr<UItemDataAsset>> ItemDataMap;
-
-	UPROPERTY(Transient)
-	TObjectPtr<UDataTable> ItemTable;
 
 	std::atomic<bool> bIsInitialized{ false };
 };

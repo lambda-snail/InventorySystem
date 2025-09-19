@@ -32,7 +32,7 @@ struct FItemRepresentation
 	bool FORCEINLINE IsEmpty() const { return Count == 0; }
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnItemAddedDelegate, FName, ItemClassId, int32, ItemInstanceId, int32, Index);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnItemAddedDelegate, FGameplayTag, ItemClassId, int32, ItemInstanceId, int32, Index);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryInitializedDelegate);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
@@ -60,10 +60,10 @@ public:
 	void SetMaxItemCount(int32 NewCount);
 
 	/** Execute logic for each slot in the inventory. If Count == 0 the slot is empty. */
-	void ForeachSlot(TFunction<void(FName, int32, int32, int32)> const& Callback) const;
+	void ForeachSlot(TFunction<void(FGameplayTag, int32, int32, int32)> const& Callback) const;
 
 	/** Execute logic for each item in the inventory. Skips empty slots, so the Index parameter is not guaranteed to be contiguous. */
-	void ForeachItem(TFunction<void(FName, int32, int32, int32)> const& Callback) const;
+	void ForeachItem(TFunction<void(FGameplayTag, int32, int32, int32)> const& Callback) const;
 
 	UPROPERTY(BlueprintAssignable, Category = "Inventory Component")
 	FOnItemAddedDelegate OnItemAdded;
@@ -91,7 +91,7 @@ private:
 
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(EditAnywhere, Category = "Inventory Component", meta = (RowType = "/Script/LambdaSnailInventorySystem.ItemDataRow"))
-	TArray<FDataTableRowHandle> DesignTimeItems{};
+	TArray<FGameplayTag> DesignTimeItems{};
 #endif
 
 	void FORCEINLINE ResetSlot(TArray<FItemRepresentation>::SizeType Index);

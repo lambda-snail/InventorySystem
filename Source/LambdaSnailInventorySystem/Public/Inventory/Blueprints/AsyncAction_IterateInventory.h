@@ -3,13 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Kismet/BlueprintAsyncActionBase.h"
 #include "AsyncAction_IterateInventory.generated.h"
 
 class IInventoryOwner;
 class UInventoryComponent;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FItemIterator, FName, ItemClassID, int32, ItemInstanceID, int32, Count, int32, Index);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FItemIterator, FGameplayTag, ItemClassID, int32, ItemInstanceID, int32, Count, int32, Index);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnIterationComplete);
 

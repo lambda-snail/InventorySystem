@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "UObject/Interface.h"
 #include "InventoryGridCellInterface.generated.h"
 
@@ -19,7 +20,7 @@ class LAMBDASNAILINVENTORYSYSTEM_API IInventoryGridCellInterface
 
 public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "LambdaSnail|Inventory")
-	void InitCell(FName ItemClassID, int32 ItemInstanceID, int32 Count, int32 Index);
+	void InitCell(FGameplayTag ItemClassID, int32 ItemInstanceID, int32 Count, int32 Index);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "LambdaSnail|Inventory")
 	void ClearCell();

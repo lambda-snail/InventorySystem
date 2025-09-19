@@ -76,20 +76,20 @@ void UInventoryComponent::SetMaxItemCount(int32 NewCount)
 {
 }
 
-void UInventoryComponent::ForeachSlot(TFunction<void(FName, int32, int32, int32)> const& Callback) const
+void UInventoryComponent::ForeachSlot(TFunction<void(FGameplayTag, int32, int32, int32)> const& Callback) const
 {
 	for (int32 Index = 0; Index < MaxItemCount; ++Index)
 	{
 		FItemRepresentation const& Slot = Items[Index];
 
 		Callback(
-			Slot.IsEmpty() ? FName() : Slot.ItemDetails.ItemClassId,
+			Slot.IsEmpty() ? FGameplayTag::EmptyTag : Slot.ItemDetails.ItemClassId,
 			Slot.IsEmpty() ? 0 : Slot.ItemDetails.ItemInstanceId,
 			Slot.Count,
 			Index);
 	}
 }
-void UInventoryComponent::ForeachItem(TFunction<void(FName, int32, int32, int32)> const& Callback) const
+void UInventoryComponent::ForeachItem(TFunction<void(FGameplayTag, int32, int32, int32)> const& Callback) const
 {
 	for (int32 Index = 0; Index < MaxItemCount; ++Index)
 	{
@@ -117,17 +117,16 @@ void UInventoryComponent::BeginPlay()
 #if WITH_EDITOR
 
 	int32 Index = 0;
-	for (FDataTableRowHandle const& Row : DesignTimeItems)
+	for (FGameplayTag const& Tag : DesignTimeItems)
 	{
 		if (Index >= MaxItemCount)
 		{
 			break;
 		}
 
-		FItemDataRow*		 RowData = Row.GetRow<FItemDataRow>("DesignTime");
 		FItemRepresentation& Item = Items[Index++];
 		Item.Count = 1;
-		Item.ItemDetails.ItemClassId = RowData->ID.GetTagName();
+		Item.ItemDetails.ItemClassId = Tag;
 	}
 #endif
 
