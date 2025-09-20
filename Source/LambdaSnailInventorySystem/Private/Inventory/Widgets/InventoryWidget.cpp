@@ -28,6 +28,9 @@ void UInventoryWidget::ReloadInventory()
 	ULambdaSnail_InventorySettings const* Settings = GetDefault<ULambdaSnail_InventorySettings>();
 	TSubclassOf<UUserWidget>			  CellWidget = Settings->InventoryCellClass;
 
+	// TODO: Pool children and reuse?
+	Grid->ClearChildren();
+
 	OwningComponent->ForeachSlot(
 		[this, CellWidget](FGameplayTag ItemClassID, int32 ItemInstanceID, int32 Count, int32 Index) {
 			UUserWidget* Cell = CreateWidget(GetOwningPlayer(), CellWidget);

@@ -17,22 +17,9 @@ UInventorySubsystem* UInventorySubsystem::Get(UObject const* WorldContextObject)
 	return nullptr;
 }
 
-// void UInventorySubsystem::GetItemClassData(FGameplayTag ItemID, TSoftObjectPtr<UItemDataAsset>& OutDataRow, bool& Success) const
-// {
-// 	FItemDataRow* DataRow = GetItemClassData(ItemID);
-// 	if (DataRow)
-// 	{
-// 		OutDataRow = *DataRow;
-// 		Success = true;
-// 		return;
-// 	}
-//
-// 	Success = false;
-// }
-
 TSoftObjectPtr<UItemDataAsset> UInventorySubsystem::GetItemClassData(FGameplayTag const ItemID) const
 {
-	return *ItemDataMap.Find(ItemID);
+	return ItemDataMap.FindRef(ItemID);
 }
 
 void UInventorySubsystem::Initialize(FSubsystemCollectionBase& Collection)

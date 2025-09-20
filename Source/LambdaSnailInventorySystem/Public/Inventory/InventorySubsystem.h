@@ -26,9 +26,6 @@ class LAMBDASNAILINVENTORYSYSTEM_API UInventorySubsystem : public UGameInstanceS
 public:
 	static UInventorySubsystem* Get(UObject const* WorldContextObject);
 
-	// UFUNCTION(BlueprintCallable, BlueprintPure, Category = "LambdaSnail|Inventory")
-	// void GetItemClassData(FGameplayTag ItemID, TSoftObjectPtr<UItemDataAsset>& OutDataRow, bool& Success) const;
-
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "LambdaSnail|Inventory")
 	TSoftObjectPtr<UItemDataAsset> GetItemClassData(FGameplayTag const ItemID) const;
 

@@ -8,10 +8,10 @@ struct FItemDetails
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LambdaSnail|Inventory")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LambdaSnail|Inventory", meta = (Categories = "Items"))
 	FGameplayTag ItemClassId{};
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "LambdaSnail|Inventory")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LambdaSnail|Inventory")
 	int32 ItemInstanceId{ 0 };
 
 	bool FORCEINLINE IsStatic() const { return ItemInstanceId == 0; }
