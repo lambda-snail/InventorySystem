@@ -1,9 +1,5 @@
 ﻿#include "Inventory/InventoryComponent.h"
 
-#if WITH_EDITOR
-	#include "Inventory/ItemDataRow.h"
-#endif
-
 #include "Inventory/ItemInterface.h"
 
 UInventoryComponent::UInventoryComponent()

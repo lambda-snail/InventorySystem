@@ -2,9 +2,7 @@
 
 #include "Engine/AssetManager.h"
 #include "Inventory/ItemDataAsset.h"
-#include "Inventory/ItemDataRow.h"
 #include "Inventory/Logging/InventoryLogging.h"
-#include "Inventory/Settings/LambdaSnail_InventorySettings.h"
 
 UInventorySubsystem* UInventorySubsystem::Get(UObject const* WorldContextObject)
 {
